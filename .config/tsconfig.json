@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "allowJs": false,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": false, // "importHelpers": true requires tslib as a runtime dependency (devDependency is not enough).
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "skipLibCheck": false,
+    "noImplicitAny": true,
+    "resolveJsonModule": true
+  }
+}

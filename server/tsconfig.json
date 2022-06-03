@@ -1,0 +1,12 @@
+{
+  "extends": "../.config/tsconfig.json",
+  "compilerOptions": {
+    "target": "es6", // Enables native async/await.
+    "outDir": "./build",
+    "sourceMap": true,
+    "baseUrl": ".",
+    "rootDir": "./src",
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["./src/**/*.spec.ts"]
+}
