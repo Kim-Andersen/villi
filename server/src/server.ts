@@ -1,10 +1,9 @@
-import 'dotenv-safe/config';
 import Koa from 'koa';
 import logger from 'koa-logger';
 import mount from 'koa-mount';
 import { apiApp } from './api-app';
 import db from './database';
-import { getEnvVar } from './environment';
+import { envVar } from './environment';
 import { webApp } from './web-app';
 
 const serverApp = new Koa();
@@ -15,6 +14,7 @@ serverApp.use(mount('/api', apiApp));
 async function startServer() {
   // Test database connection.
   try {
+    console.log(`Connecting to database...`);
     await db.testConnection();
     console.log('✅  Connected to database');
   } catch (error) {
@@ -24,7 +24,7 @@ async function startServer() {
   }
 
   // All good, ready to listen to incoming requests.
-  const port = getEnvVar('PORT');
+  const port = envVar('PORT');
   serverApp.listen(port, () => console.log(`✅  Server started on port ${port}`));
 }
 

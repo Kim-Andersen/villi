@@ -1,9 +1,9 @@
 {
-  "name": "villi",
+  "name": "villi-server",
   "scripts": {
-    "start": "npx nodemon src/server.ts",
-    "build": "tsc",
-    "setup": "npm run symlink-shared",
+    "start": "npx nodemon -r dotenv/config src/server.ts",
+    "build": "tsc && node scripts/build.js",
+    "setup": "npm run symlink-shared && npm run migrate up",
     "symlink-shared": "symlink-dir \"../shared/src\" \"src/shared\"",
     "migrate": "node-pg-migrate"
   },
@@ -14,7 +14,8 @@
     "@types/koa-logger": "3.1.2",
     "@types/koa-mount": "4.0.1",
     "@types/koa-router": "7.4.4",
-    "dotenv-safe": "8.2.0",
+    "cpx": "1.5.0",
+    "dotenv": "16.0.1",
     "nodemon": "2.0.16",
     "symlink-dir": "5.0.1",
     "ts-node": "10.8.0",

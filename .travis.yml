@@ -1,0 +1,27 @@
+language: node_js
+
+node_js:
+  - 14
+
+addons:
+  postgresql: 10
+  apt:
+    packages:
+      - postgresql-10-postgis-2.4
+
+services:
+  - postgresql
+
+cache:
+  directories:
+    - node_modules
+
+before_script:
+  - psql -U postgres -c "CREATE EXTENSION postgis"
+  - psql -c 'CREATE DATABASE travis_ci_test;' -U postgres
+  - npm install -g nodechef-cli
+  - npm run setup
+  - npm run build
+
+after_script:
+  - nodechef deploy -i villi -auth ${NC_DEPLOY_TOKEN} -l server/build --rebuild

@@ -1,0 +1,16 @@
+{
+  "name": "villi",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [],
+  "author": "Kim Andersen",
+  "license": "ISC",
+  "engines": {
+    "node": ">=v14"
+  },
+  "scripts": {
+    "postinstall": "npm ci --prefix server",
+    "setup": "npm run setup --prefix server",
+    "build": "npm run build --prefix server"
+  }
+}

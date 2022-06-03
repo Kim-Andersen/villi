@@ -3,3 +3,4 @@
 **/tsconfig.tsbuildinfo
 **/.env
 .DS_Store
+__ncbundle__.zip
