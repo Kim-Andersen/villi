@@ -34,4 +34,18 @@ router.get('/users', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
   }
 });
 
+router.get('/places', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
+  try {
+    const res = await db.query('SELECT * FROM places')
+    ctx.body = { users: res.rows };
+    await next();
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log(err.stack);
+    } else {
+      console.log(err);
+    }
+  }
+});
+
 export const apiApp = app;

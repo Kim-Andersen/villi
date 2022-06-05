@@ -1,9 +1,9 @@
 const { writeFileSync, readFileSync } = require('fs');
+const { copySync } = require('fs-extra');
 const { normalize } = require('path');
-const { execSync } = require("child_process");
 
 // Copy migrations to build/migrations
-execSync('cpx migrations/* build/migrations');
+copySync('migrations', normalize('build/migrations'));
 
 // Create build/package.json
 const { dependencies } = JSON.parse(readFileSync('package.json', 'utf8'));
