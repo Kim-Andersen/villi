@@ -1,4 +1,4 @@
-type EnvironmentVariable = 'PORT' | 'DATABASE_URL';
+type EnvironmentVariable = 'PORT' | 'DATABASE_URL' | 'GEOCODER_API_KEY';
 
 export const envVar = (name: EnvironmentVariable): string => {
   if (process.env[name]) {

@@ -4,6 +4,7 @@ import logger from 'koa-logger';
 import Router from 'koa-router';
 import db from '../database';
 import { Place } from '../shared/types';
+import { geocode } from './geocode';
 
 const app = new Koa();
 const router = new Router();
@@ -85,6 +86,26 @@ router.post('/places', async (ctx: Koa.Context, next: () => Promise<unknown>) =>
   }
   
   await next();
+});
+
+router.get('/geocode', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
+  const query = ctx.query['query'] as string;
+  console.log('getcode query', query);
+
+  const geocodeResults = await geocode(query);
+  console.log('geocodeResults', geocodeResults);
+  
+  
+  try {
+    ctx.body = geocodeResults;
+    await next();
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log(err.stack);
+    } else {
+      console.log(err);
+    }
+  }
 });
 
 export const apiApp = app;
