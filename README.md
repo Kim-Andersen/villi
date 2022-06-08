@@ -1,5 +1,4 @@
 # Villi
-
 ## Travis CI
 
 A `NC_DEPLOY_TOKEN` environment variable must be added to Travis environment variables.

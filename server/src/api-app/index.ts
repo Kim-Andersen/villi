@@ -1,3 +1,4 @@
+import HttpStatus from 'http-status';
 import Koa from 'koa';
 import json from 'koa-json';
 import logger from 'koa-logger';
@@ -18,7 +19,7 @@ app.use(router.routes()).use(router.allowedMethods());
 
 router.get('/', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
   ctx.body = { message: 'Welcome to the p API!' };
-
+  ctx.status = HttpStatus.OK;
   await next();
 });
 
@@ -26,6 +27,7 @@ router.get('/users', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
   try {
     const res = await db.query('SELECT * FROM users')
     ctx.body = { users: res.rows };
+    ctx.status = HttpStatus.OK;
     await next();
   } catch (err) {
     if (err instanceof Error) {
@@ -40,6 +42,7 @@ router.get('/places', async (ctx: Koa.Context, next: () => Promise<unknown>) => 
   try {
     const res = await db.query('SELECT * FROM places');
     ctx.body = { places: res.rows };
+    ctx.status = HttpStatus.OK;
     await next();
   } catch (err) {
     if (err instanceof Error) {
@@ -75,6 +78,7 @@ router.post('/places', async (ctx: Koa.Context, next: () => Promise<unknown>) =>
   try {
     const result = await db.query(query, params);
     ctx.body = result.rows[0];
+    ctx.status = HttpStatus.CREATED;
   } catch (err) {
     if (err instanceof Error) {
       ctx.body = { error: err.stack };
@@ -98,6 +102,7 @@ router.get('/geocode', async (ctx: Koa.Context, next: () => Promise<unknown>) =>
   
   try {
     ctx.body = geocodeResults;
+    ctx.status = HttpStatus.OK;
     await next();
   } catch (err) {
     if (err instanceof Error) {

@@ -1,15 +1,20 @@
 import Koa from 'koa';
 import logger from 'koa-logger';
 import mount from 'koa-mount';
+import serveStatic from 'koa-static';
+import { join, normalize } from 'path';
 import { apiApp } from './api-app';
 import db from './database';
 import { envVar } from './environment';
 import { webApp } from './web-app';
 
+const publicDir = normalize(join(__dirname, 'public'));
 const serverApp = new Koa();
 serverApp.use(logger());
+serverApp.use(serveStatic(publicDir));
 serverApp.use(mount('/', webApp)); // Start with the "/" route so it doesn't catch all routes.
 serverApp.use(mount('/api', apiApp));
+serverApp.use(mount('/admin', serveStatic(normalize(join(publicDir, '/admin-app')))));
 
 async function startServer() {
   // Test database connection.

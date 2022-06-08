@@ -22,6 +22,7 @@ before_script:
   - npm install -g nodechef-cli
   - npm run setup
   - npm run build
+  - npm run prepare-server-deploy
 
 after_script:
-  - nodechef deploy -i villi -auth ${NC_DEPLOY_TOKEN} -l server/build --rebuild
+  - nodechef deploy -i villi -auth ${NC_DEPLOY_TOKEN} -l server/deploy --rebuild

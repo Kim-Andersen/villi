@@ -1,6 +1,8 @@
+deploy
 **/node_modules
 **/build
 **/tsconfig.tsbuildinfo
 **/.env
+server/deploy
 .DS_Store
 __ncbundle__.zip

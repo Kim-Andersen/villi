@@ -20,7 +20,10 @@ router.get('/', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
       <title>Villi</title>
       <body>
         <h1>Villi</h1>
-        <a href="/api">Go to the API</a>
+        <ul>
+          <li><a href="/api">API</a></li>
+          <li><a href="/admin">Admin</a></li>
+        </ul>
       </body>
     </html>
   `;

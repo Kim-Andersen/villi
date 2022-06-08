@@ -9,8 +9,12 @@
     "node": ">=v14"
   },
   "scripts": {
-    "postinstall": "npm ci --prefix server",
-    "setup": "npm run setup --prefix server",
-    "build": "npm run build --prefix server"
+    "postinstall": "npm ci --prefix server && npm ci --prefix web-apps/admin",
+    "setup": "npm run setup --prefix server && npm run setup --prefix web-apps/admin",
+    "build": "npm run build --prefix server && npm run build --prefix web-apps/admin",
+    "prepare-server-deploy": "node scripts/prepare-server-deploy.js"
+  },
+  "devDependencies": {
+    "fs-extra": "10.1.0"
   }
 }
