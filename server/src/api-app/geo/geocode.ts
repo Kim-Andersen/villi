@@ -1,5 +1,5 @@
 import NodeGeoCoder from 'node-geocoder';
-import { envVar } from '../environment';
+import { envVar } from '../../environment';
 
 const options: NodeGeoCoder.Options = {
   apiKey: envVar('GEOCODER_API_KEY'),

@@ -1,26 +1,61 @@
+import Alert from '@mui/material/Alert';
+import Container from '@mui/material/Container';
+import LinearProgress from '@mui/material/LinearProgress';
+import Snackbar from '@mui/material/Snackbar';
+import { useObservableGetState } from 'observable-hooks';
 import React from 'react';
-import logo from './logo.svg';
+import { Link, Route, Routes } from "react-router-dom";
+import { backendAPI } from './api/backendAPI';
 import './App.css';
+import Home from './home/Home';
+import EditPlace from './places/EditPlace';
+import PlaceList from './places/PlaceList';
+import ScrollToTop from './ScrollToTop';
+import snackbarService, { SnackbarOptions } from './snackbar/snackbarService';
+import UserList from './users/UserList';
 
-function App() {
+function App(): React.ReactElement {
+  const working = useObservableGetState<boolean>(backendAPI.working, false);
+  const snackbar = useObservableGetState<SnackbarOptions | null>(snackbarService.snackbar, null);
+
+  function handleSnackbarClose() {
+    if (arguments[1] !== 'clickaway') {
+      snackbarService.handleCloseSnackbar();
+    }
+  }
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div id="app">
+      <div id="app-progress">
+        {working && <LinearProgress />}
+      </div>
+      <Container>
+        <nav>
+          <ul>
+            <li><Link to="/users">Users</Link></li>
+            <li><Link to="/places">Places</Link></li>
+          </ul>
+        </nav>
+        <main>
+          <ScrollToTop />
+          <Routes>
+            <Route path="places" element={<PlaceList />}></Route>
+            <Route path="places/:placeId" element={<EditPlace />}></Route>
+            <Route path="users" element={<UserList />}></Route>
+            <Route path="/" element={<Home />}></Route>
+          </Routes>
+        </main>
+      </Container>
+
+      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }} disableWindowBlurListener key={snackbar ? snackbar.message : 'foo'} open={snackbar !== null} autoHideDuration={5000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity={snackbar ? snackbar.severity : 'info'} sx={{ width: '100%' }}>
+          {snackbar ? snackbar.message : ''}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
 
 export default App;
+
+

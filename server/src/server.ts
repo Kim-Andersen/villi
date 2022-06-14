@@ -10,6 +10,7 @@ import { webApp } from './web-app';
 
 const publicDir = normalize(join(__dirname, 'public'));
 const serverApp = new Koa();
+
 serverApp.use(logger());
 serverApp.use(serveStatic(publicDir));
 serverApp.use(mount('/', webApp)); // Start with the "/" route so it doesn't catch all routes.
