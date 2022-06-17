@@ -12,6 +12,7 @@ import snackbarService from '../snackbar/snackbarService';
 import formatDateTime from '../utils/formatDateTime';
 import FindLocationDialog, { FindLocationResult } from './FindLocationDialog';
 import getStaticMapUrl from './getStaticMapUrl';
+import PlacePhotos from './PlacePhotos';
 import placesService from './placesService';
 import useEditPlace from './useEditPlace';
 
@@ -21,7 +22,7 @@ export default function EditPlace(): React.ReactElement {
   const [place, setPlaceUpdate, loading, error] = useEditPlace(placeId);
   const [openFindLocationDialog, setOpenFindLocationDialog] = useState<boolean>(false);
   
-  function handleOnChange(event: React.ChangeEvent<HTMLInputElement| HTMLTextAreaElement>) {
+  function handleOnChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     if (place) {
       const target = event.target;
       setPlaceUpdate({
@@ -201,6 +202,8 @@ export default function EditPlace(): React.ReactElement {
               </Grid>
             </Grid>
           </Grid>
+
+          <PlacePhotos placeId={placeId} />
         </Box>       
       </div>
     ); 

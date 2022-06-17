@@ -1,7 +1,7 @@
 import Ajv, { JSONSchemaType } from 'ajv';
 import AjvErrors from 'ajv-errors';
 import { PlaceRules } from '../../shared/constants';
-import { PlaceCreation } from '../../shared/types';
+import { PlaceCreation, PlaceUpdate } from '../../shared/types';
 
 const ajv = new Ajv({ allErrors: true });
 AjvErrors(ajv);
@@ -28,11 +28,12 @@ export const placeCreationSchema: JSONSchemaType<PlaceCreation> = {
 }
 export const validatePlaceCreation = ajv.compile(placeCreationSchema);
 
-export const placeUpdateSchema: JSONSchemaType<PlaceCreation> = {
+export const placeUpdateSchema: JSONSchemaType<PlaceUpdate> = {
   type: "object",
-  required: ["name"],
+  required: ["id", "name"],
   additionalProperties: false,
   properties: {
+    id: { type: "integer" },
     name: { type: "string", "minLength": 1, "maxLength": PlaceRules.name.maxLength },
     description: { type: "string", "minLength": 1, "maxLength": PlaceRules.description.maxLength },
     street_name: { type: "string", "minLength": 1, "maxLength": PlaceRules.street_name.maxLength },

@@ -1,4 +1,5 @@
 export type PlaceId = number;
+export type PhotoId = number;
 
 export type Place = {
   id: PlaceId;
@@ -61,4 +62,20 @@ export type GeoAutocompleteResult = {
   postal_code: string,
   country: string,
   coordinates: [number, number];
+};
+
+export type PhotoSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
+export type Photo = {
+  id: number;
+  created_at: Date;
+  key: string;
+  type: string;
+  bucket: string;
+  sizes: Array<PhotoSize>;
+};
+
+export type PhotoCreation = {
+  file: File;
+  contentType: string;
 };

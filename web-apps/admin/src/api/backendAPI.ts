@@ -11,12 +11,12 @@ class BackendAPI {
     return this.makeRequest<ResponseType>(resource, 'get');
   }
 
-  public async post<ResponseType>(resource: string, data: object): Promise<ResponseType> {
-    return this.makeRequest<ResponseType>(resource, 'post', { body: data });
+  public async post<ResponseType>(resource: string, body: object | null, raw?: any): Promise<ResponseType> {
+    return this.makeRequest<ResponseType>(resource, 'post', { body: body === null ? undefined : body, raw });
   }
 
-  public async put<ResponseType>(resource: string, data: object): Promise<ResponseType> {
-    return this.makeRequest<ResponseType>(resource, 'put', { body: data });
+  public async put<ResponseType>(resource: string, body: object | null, raw?: any): Promise<ResponseType> {
+    return this.makeRequest<ResponseType>(resource, 'put', { body: body === null ? undefined : body, raw });
   }
 
   public async delete(resource: string): Promise<Response> {
@@ -27,16 +27,21 @@ class BackendAPI {
     return this.workingState.value;
   }
 
-  private async makeRequest<ResponseType>(resource: string, method: HttpMethod, options: { body?: object } = {}): Promise<ResponseType> {
+  private async makeRequest<ResponseType>(resource: string, method: HttpMethod, options: { body?: object | undefined, raw?: any } = {}): Promise<ResponseType> {
     this.workingState.next(true);
 
     const url = `${this.apiBaseUrl}${resource}`;
-    const requestInit: RequestInit = {
-      headers: { 'Content-Type': 'application/json' },
-    };
-    if (typeof options.body === 'object') {
+    const requestInit: RequestInit = {};
+
+    if (options.raw) {
+      requestInit.body = options.raw;
+    } else if (typeof options.body === 'object') {
+      requestInit.headers = { 'Content-Type': 'application/json' };
       requestInit.body = JSON.stringify(options.body);
+    } else if (method === 'post' || method === 'put') {
+      throw new TypeError(`Nothing to send. One of body or raw parameters must be defined.`);
     }
+
     if (method !== 'get') {
       requestInit.method = method;
     }

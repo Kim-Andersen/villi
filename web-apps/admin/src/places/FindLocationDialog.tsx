@@ -5,8 +5,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import React from 'react';
-import { Place } from '../shared/types';
-import { GeoAutocompleteResult } from './geoService';
+import { GeoAutocompleteResult, Place } from '../shared/types';
 import getStaticMapUrl from './getStaticMapUrl';
 import LocationAutocomplete from './LocationAutocomplete';
 

@@ -1,9 +1,15 @@
-import HttpStatus from 'http-status';
+import httpStatus from 'http-status';
 import Koa from 'koa';
+import koaBody from 'koa-body';
 import Router from 'koa-router';
 import db from '../../database';
 import { Place, PlaceCreation, PlaceUpdate } from '../../shared/types';
+import photoService from './photoService';
 import { validatePlaceCreation, validatePlaceUpdate } from './schemas';
+
+function sanitizePlaceId(placeId: string): number {
+  return Number(placeId);
+}
 
 const router = new Router({
   prefix: '/places'
@@ -13,7 +19,7 @@ router.get('/', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
   try {
     const res = await db.query(`SELECT *, ST_AsGeoJSON(location)::json->'coordinates' as coordinates FROM places ORDER BY id ASC`);
     ctx.body = { places: res.rows };
-    ctx.status = HttpStatus.OK;
+    ctx.status = httpStatus.OK;
     await next();
   } catch (err) {
     if (err instanceof Error) {
@@ -29,8 +35,8 @@ router.post('/', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
 
   const valid = validatePlaceCreation(placeCreation);
   if (!valid) {
-    ctx.status = HttpStatus.BAD_REQUEST;
-    ctx.body = validatePlaceUpdate.errors;
+    ctx.status = httpStatus.BAD_REQUEST;
+    ctx.body = validatePlaceCreation.errors;
     return await next();
   }
 
@@ -51,7 +57,7 @@ router.post('/', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
   try {
     const result = await db.query(query, params);
     ctx.body = result.rows[0];
-    ctx.status = HttpStatus.CREATED;
+    ctx.status = httpStatus.CREATED;
   } catch (err) {
     if (err instanceof Error) {
       ctx.body = { error: err.stack };
@@ -66,12 +72,12 @@ router.post('/', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
 });
 
 router.put('/:placeId', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
-  const placeId = Number(ctx.params.placeId);
+  const placeId = sanitizePlaceId(ctx.params.placeId);
   const placeUpdate = ctx.request.body.place as PlaceUpdate;
 
   const valid = validatePlaceUpdate(placeUpdate);
   if (!valid) {
-    ctx.status = HttpStatus.BAD_REQUEST;
+    ctx.status = httpStatus.BAD_REQUEST;
     ctx.body = validatePlaceUpdate.errors;
     return await next();
   }
@@ -97,26 +103,84 @@ router.put('/:placeId', async (ctx: Koa.Context, next: () => Promise<unknown>) =
   await db.query(query, params);
   
   ctx.body = placeUpdate;
-  ctx.status = HttpStatus.OK;
+  ctx.status = httpStatus.OK;
   await next();
 });
 
 router.delete('/:placeId', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
-  const placeId = Number(ctx.params.placeId);
+  const placeId = sanitizePlaceId(ctx.params.placeId);
 
   try {
     const result = await db.query(`DELETE FROM places WHERE id = ${placeId}`);
     if (result.rowCount === 1) {
-      ctx.status = HttpStatus.OK;
-      ctx.body = { status: HttpStatus.OK, message: `Place id ${placeId} was deleted.` };
+      ctx.status = httpStatus.OK;
+      ctx.body = { status: httpStatus.OK, message: `Place id ${placeId} was deleted.` };
     } else {
-      ctx.status = HttpStatus.NOT_FOUND;
-      ctx.body = { status: HttpStatus.NOT_FOUND, message: `Place id ${placeId} not found.` };
+      ctx.status = httpStatus.NOT_FOUND;
+      ctx.body = { status: httpStatus.NOT_FOUND, message: `Place id ${placeId} not found.` };
     }
   } catch (err) {
     console.log(`Failed to delete place id ${placeId}`, err);
-    ctx.status = HttpStatus.INTERNAL_SERVER_ERROR;
+    ctx.status = httpStatus.INTERNAL_SERVER_ERROR;
   }
+  await next();
+});
+
+/**
+ * Add photos to a place.
+ */
+router.post(
+  '/:placeId/photos', 
+  koaBody({ multipart: true, formidable: { uploadDir: './uploads' } }), 
+  async (ctx: Koa.Context, next: () => Promise<unknown>) => {
+  const placeId = sanitizePlaceId(ctx.params.placeId);
+
+  if (ctx.request.files === undefined || ctx.request.files.file === undefined) {
+    ctx.status = httpStatus.BAD_REQUEST;
+    ctx.body = { error: { message: 'No file found.' } };
+    return await next();  
+  };
+
+  const filePath = (ctx.request.files.file as any).filepath;
+  const contentType = (ctx.request.files.file as any).mimetype;
+
+  try {
+    const photo = await photoService.addPhoto({ bucket: 'villi-photos', filePath, contentType, sizes: ['sm', 'md'] });
+    await db.query(`INSERT INTO place_photos(place_id, photo_id) VALUES($1,$2)`, [placeId, photo.id])
+    ctx.status = httpStatus.OK;
+    ctx.body = photo;
+  } catch (error) {
+    console.log(`Failed to add photo to place id ${placeId}`, error);
+    ctx.status = httpStatus.INTERNAL_SERVER_ERROR;
+  }
+
+  await next();
+});
+
+router.get('/:placeId/photos', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
+  const placeId = sanitizePlaceId(ctx.params.placeId);
+  const query = `
+    select p.id, p.created_at, p.key, p.bucket, p.type, to_json(p.sizes) as sizes
+    from photos p inner join place_photos pp on pp.photo_id = p.id 
+    where pp.place_id = ${placeId}`;
+  const result = await db.query(query);
+
+  ctx.body = result.rows;
+  ctx.status = httpStatus.OK;
+  await next();
+});
+
+router.delete('/:placeId/photos/:photoId', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
+  // const placeId = sanitizePlaceId(ctx.params.placeId);
+  const photoId = Number(ctx.params.photoId);
+  const deleted = await photoService.deletePhoto(photoId);
+
+  if (deleted) {
+    ctx.status = httpStatus.OK;
+  } else {
+    ctx.status = httpStatus.NOT_FOUND;
+  }
+  ctx.body = {};
   await next();
 });
 

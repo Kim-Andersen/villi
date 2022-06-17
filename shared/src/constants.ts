@@ -7,3 +7,8 @@ export const PlaceRules = {
   postal_code: { maxLength: 20 },
   city: { maxLength: 50 }
 };
+
+export const MediaRules = {
+  name: { maxLength: 50 },
+  type: { maxLength: 20 }
+}
