@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import Koa from 'koa';
 import koaBody from 'koa-body';
 import Router from 'koa-router';
+import { uniq } from 'lodash';
 import db from '../../database';
 import { Place, PlaceCreation, PlaceUpdate } from '../../shared/types';
 import photoService from './photoService';
@@ -181,6 +182,37 @@ router.delete('/:placeId/photos/:photoId', async (ctx: Koa.Context, next: () => 
     ctx.status = httpStatus.NOT_FOUND;
   }
   ctx.body = {};
+  await next();
+});
+
+router.get('/:placeId/types', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
+  const placeId = sanitizePlaceId(ctx.params.placeId);
+
+  const query = `
+    SELECT top.id
+    FROM types_of_places top INNER JOIN place_types pt on pt.type_id = top.id 
+    WHERE pt.place_id = ${placeId}`;
+  const result = await db.query(query);
+  ctx.body = result.rows;
+  ctx.status = httpStatus.OK;
+  await next();
+});
+
+router.post('/:placeId/types', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
+  const placeId = sanitizePlaceId(ctx.params.placeId);
+  const types = uniq(ctx.request.body.types) as number[];
+
+  await db.transaction([
+    {
+      query: `DELETE FROM place_types WHERE place_id = ${placeId}`
+    },
+    {
+      query: `INSERT INTO place_types (place_id, type_id) VALUES ${types.map(id => `(${placeId}, ${id})`)}`
+    }
+  ])
+
+  ctx.body = {};
+  ctx.status = httpStatus.OK;
   await next();
 });
 

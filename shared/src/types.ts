@@ -1,5 +1,6 @@
 export type PlaceId = number;
 export type PhotoId = number;
+export type TypeOfPLaceId = number;
 
 export type Place = {
   id: PlaceId;
@@ -78,4 +79,9 @@ export type Photo = {
 export type PhotoCreation = {
   file: File;
   contentType: string;
+};
+
+export type TypeOfPlace = {
+  id: TypeOfPLaceId;
+  name: string;
 };
