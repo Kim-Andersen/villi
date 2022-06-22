@@ -9,6 +9,9 @@ import { backendAPI } from './api/backendAPI';
 import './App.css';
 import Home from './home/Home';
 import EditPlace from './places/EditPlace';
+import EditPlaceInfo from './places/EditPlaceInfo';
+import EditPlacePhotos from './places/EditPlacePhotos';
+import EditPlaceTypes from './places/EditPlaceTypes';
 import PlaceList from './places/PlaceList';
 import ScrollToTop from './ScrollToTop';
 import snackbarService, { SnackbarOptions } from './snackbar/snackbarService';
@@ -40,7 +43,11 @@ function App(): React.ReactElement {
           <ScrollToTop />
           <Routes>
             <Route path="places" element={<PlaceList />}></Route>
-            <Route path="places/:placeId" element={<EditPlace />}></Route>
+            <Route path="places/:placeId" element={<EditPlace />}>
+              <Route path="" element={<EditPlaceInfo />}></Route>
+              <Route path="photos" element={<EditPlacePhotos />}></Route>
+              <Route path="types" element={<EditPlaceTypes />}></Route>
+            </Route>
             <Route path="users" element={<UserList />}></Route>
             <Route path="/" element={<Home />}></Route>
           </Routes>

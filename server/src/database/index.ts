@@ -1,8 +1,10 @@
+import debug from 'debug';
 import { Pool, QueryResult } from 'pg';
-import { envVar } from '../environment';
+import config from '../config';
+import { IDatabase, TransactionQuery } from './types';
 
 const pool = new Pool({
-  connectionString: envVar('DATABASE_URL')
+  connectionString: config.postgres.connectionString
 });
 
 pool.connect
@@ -12,7 +14,13 @@ pool.on('error', err => {
   process.exit(-1)
 });
 
-class Database {
+class Database implements IDatabase {
+  private readonly log: debug.Debugger;
+
+  constructor() {
+    this.log = debug(Database.name);
+  }
+
   public async testConnection(): Promise<boolean> {
     const client = await pool.connect()
     await client.query('SELECT NOW()')
@@ -24,7 +32,7 @@ class Database {
     const start = Date.now();
     const result = await pool.query(query, params);
     const duration = `${Date.now() - start} ms`;
-    console.log('executed query', { query, rows: result.rowCount, duration });
+    this.log('executed query', { query, rows: result.rowCount, duration });
     return result;
   }
 
@@ -40,7 +48,7 @@ class Database {
       }
 
       const duration = `${Date.now() - start} ms`;
-      console.log('Executed transaction', { duration, queryCount: queries.length });
+      this.log('Executed transaction', { duration, queryCount: queries.length });
     } catch (e) {
       await client.query('ROLLBACK');
       throw e;
@@ -50,7 +58,5 @@ class Database {
   }
 }
 
-const db = new Database();
-export default db;
-
-type TransactionQuery = { query: string, params?: any[] };
+const database = new Database();
+export default database;

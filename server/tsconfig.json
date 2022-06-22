@@ -6,6 +6,7 @@
     "sourceMap": true,
     "baseUrl": ".",
     "rootDir": "./src",
+    "experimentalDecorators": true
   },
   "include": ["./src/**/*"],
   "exclude": ["./src/**/*.spec.ts"]

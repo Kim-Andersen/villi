@@ -1,6 +1,13 @@
 export type PlaceId = number;
 export type PhotoId = number;
-export type TypeOfPLaceId = number;
+export type TypeOfPlaceId = number;
+
+export type APIResponse<PayloadType, ValidationErrorType> = PayloadType & {
+  error?: {
+    message: string;
+    validationErrors?: ValidationErrorType[]
+  };
+};
 
 export type Place = {
   id: PlaceId;
@@ -19,11 +26,14 @@ export type Place = {
 }
 export type PlaceUpdate = Omit<Place, 'created_at' | 'updated_at'>;
 export type PlaceCreation = Omit<Place, 'id' | 'created_at' | 'updated_at'>;
+export type PlaceUpdateResult = Pick<Place, 'id' | 'updated_at'>;
 
 export type User = {
   id: number;
   email: string;
-}
+};
+
+export type UserListItem = Pick<User, 'id' | 'email'>;
 
 export type GeocodeResult = {
   formattedAddress?: string | undefined;
@@ -54,7 +64,7 @@ export type GeocodeResult = {
 };
 
 export type GeoAutocompleteResult = {
-  key: number;
+  key: string;
   name: string,
   street_name: string,
   street_number: string,
@@ -82,6 +92,24 @@ export type PhotoCreation = {
 };
 
 export type TypeOfPlace = {
-  id: TypeOfPLaceId;
+  id: TypeOfPlaceId;
   name: string;
+};
+
+export type PlaceTypesUpdate = {
+  types: TypeOfPlaceId[];
+};
+
+export type PlaceType = {
+  type_id: TypeOfPlaceId;
+  place_id: PlaceId;
+};
+
+export type PlaceSearchResult = {
+  places: Place[];
+};
+
+export type Location = {
+  latitude: number;
+  longitude: number;
 };

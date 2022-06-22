@@ -5,21 +5,18 @@ import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import config from '../config';
 import photoHelper from '../shared/photoHelper';
 import { Photo, PhotoId, PlaceId } from '../shared/types';
 import snackbarService from '../snackbar/snackbarService';
 import placesService from './placesService';
 import UploadPhoto from './UploadPhoto';
 
-
-type Props = {
-  placeId: PlaceId;
-};
-
-export default function PlacePhotos({ placeId }: Props): React.ReactElement {  
+export default function EditPlacePhotos(): React.ReactElement {  
+  const placeId = Number(useParams<keyof { placeId: PlaceId }>().placeId);
   const [photos, setPhotos] = useState<Photo[] | null>(null);
   
-
   async function fetchPhotos() {
     return placesService.getPhotos(placeId).then(photos => setPhotos(photos));
   }
@@ -28,7 +25,7 @@ export default function PlacePhotos({ placeId }: Props): React.ReactElement {
     fetchPhotos();
   }, [placeId]);
 
-  async function uploadPhoto(file: File): Promise<void> {
+  async function addPhoto(file: File): Promise<void> {
     try {
       await placesService.addPhoto(placeId, { file: file, contentType: file.type });
       snackbarService.showSnackbar('Photo added.', 'success');
@@ -47,11 +44,11 @@ export default function PlacePhotos({ placeId }: Props): React.ReactElement {
 
   return (
     <React.Fragment>
-      <UploadPhoto onUpload={uploadPhoto} disabled={placesService.isWorking} />
+      <UploadPhoto onUpload={addPhoto} disabled={placesService.isWorking} />
       
       {photos && <ImageList variant='quilted' sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
         {photos.map(({ id, key, bucket, sizes }) => {
-          const url = photoHelper.getPhotoUrl({ key, bucket, size: sizes.find(s => s === 'sm') || sizes[0] });
+          const url = photoHelper.getPhotoUrl(config.environment, { key, bucket, size: sizes.find(s => s === 'sm') || sizes[0] });
           return (
             <ImageListItem key={id}>
               <img src={url} loading="lazy" alt={key} />

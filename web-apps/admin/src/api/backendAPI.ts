@@ -1,4 +1,6 @@
 import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
+import config from '../config';
+import { APIResponse } from '../shared/types';
 import { HttpMethod } from './types';
 
 class BackendAPI {
@@ -7,27 +9,27 @@ class BackendAPI {
   
   constructor(public readonly apiBaseUrl: string) {}
 
-  public async get<ResponseType>(resource: string): Promise<ResponseType> {
-    return this.makeRequest<ResponseType>(resource, 'get');
+  public async get<PayloadType>(resource: string): Promise<APIResponse<PayloadType, unknown>> {
+    return this.makeRequest<PayloadType>(resource, 'get');
   }
 
-  public async post<ResponseType>(resource: string, body: object | null, raw?: any): Promise<ResponseType> {
-    return this.makeRequest<ResponseType>(resource, 'post', { body: body === null ? undefined : body, raw });
+  public async post<PayloadType>(resource: string, body: object | null, raw?: any): Promise<APIResponse<PayloadType, unknown>> {
+    return this.makeRequest<PayloadType>(resource, 'post', { body: body === null ? undefined : body, raw });
   }
 
-  public async put<ResponseType>(resource: string, body: object | null, raw?: any): Promise<ResponseType> {
-    return this.makeRequest<ResponseType>(resource, 'put', { body: body === null ? undefined : body, raw });
+  public async put<PayloadType>(resource: string, body: object | null, raw?: any): Promise<APIResponse<PayloadType, unknown>> {
+    return this.makeRequest<PayloadType>(resource, 'put', { body: body === null ? undefined : body, raw });
   }
 
-  public async delete(resource: string): Promise<Response> {
-    return this.makeRequest(resource, 'delete');
+  public async delete<PayloadType>(resource: string): Promise<APIResponse<PayloadType, unknown>> {
+    return this.makeRequest<PayloadType>(resource, 'delete');
   }
 
   public get isWorking(): boolean {
     return this.workingState.value;
   }
 
-  private async makeRequest<ResponseType>(resource: string, method: HttpMethod, options: { body?: object | undefined, raw?: any } = {}): Promise<ResponseType> {
+  private async makeRequest<PayloadType>(resource: string, method: HttpMethod, options: { body?: object | undefined, raw?: any } = {}): Promise<APIResponse<PayloadType, unknown>> {
     this.workingState.next(true);
 
     const url = `${this.apiBaseUrl}${resource}`;
@@ -46,13 +48,12 @@ class BackendAPI {
       requestInit.method = method;
     }
 
-    // Optionally log request.
     console.log(method, url, requestInit);
 
     try {
       const response = await fetch(url, requestInit);
       if (response.ok) {
-        return response.json() as unknown as ResponseType;
+        return await response.json();
       }
       throw response;
     } catch(error) {
@@ -64,4 +65,4 @@ class BackendAPI {
   }
 }
 
-export const backendAPI = new BackendAPI('http://localhost:3001/api');
+export const backendAPI = new BackendAPI(config.serverRootURL + '/api');

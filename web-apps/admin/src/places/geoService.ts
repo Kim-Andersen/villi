@@ -1,17 +1,12 @@
 import { backendAPI } from '../api/backendAPI';
 import { GeoAutocompleteResult, GeocodeResult } from '../shared/types';
 class GeoService {
-  private uniqueKeyIncrementer = 0;
-
   public geocode(query: string): Promise<GeocodeResult[]> {
     return backendAPI.get<GeocodeResult[]>(`/geo/code?query=${query}`);
   }
 
   public async autocomplete(query: string): Promise<(GeoAutocompleteResult)[]> {
-    return backendAPI.get<GeoAutocompleteResult[]>(`/geo/autocomplete?query=${query}`)
-      .then(results  => results.map(result => 
-        ({ ...result, key: ++this.uniqueKeyIncrementer })
-      ));
+    return backendAPI.get<GeoAutocompleteResult[]>(`/geo/autocomplete?query=${query}`);
   }
 
   public get isWorking(): boolean {

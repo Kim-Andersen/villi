@@ -1,18 +1,24 @@
 import { pick } from 'lodash';
 import { BehaviorSubject } from 'rxjs';
 import { backendAPI } from '../api/backendAPI';
-import { Photo, PhotoCreation, PhotoId, Place, PlaceId, PlaceUpdate } from '../shared/types';
+import { Photo, PhotoCreation, PhotoId, Place, PlaceCreation, PlaceId, PlaceUpdate, TypeOfPlace, TypeOfPlaceId } from '../shared/types';
+import snackbarService from '../snackbar/snackbarService';
 import { IPlacesServivce } from './types';
 
 class PlacesService implements IPlacesServivce {
-  private fetchComplete: Promise<void>;
+  private initializationComplete: Promise<unknown>;
   private placesState = new BehaviorSubject<Place[]>([]);
+  private typesOfPlacesState = new BehaviorSubject<TypeOfPlace[]>([]);
 
   public places = this.placesState.asObservable();
+  public typesOfPlaces = this.typesOfPlacesState.asObservable();
   public working = backendAPI.working;
 
   constructor() {
-    this.fetchComplete = this.fetchPlaces();
+    this.initializationComplete = Promise.all([
+      this.fetchPlaces(),
+      this.fetchTypesOfPlaces()
+    ]);
   }
 
   public get isWorking(): boolean {
@@ -20,14 +26,19 @@ class PlacesService implements IPlacesServivce {
   }
 
   public async fetchPlaces(): Promise<void> {
-    const { places } = await backendAPI.get<{ places: Place[] }>('/places');
+    const places = await backendAPI.get<Place[]>('/places');
     this.placesState.next(places);
   }
 
-  public async createNewSpace(place: Partial<Place> = {}): Promise<Place> {
-    const newPlace = await backendAPI.post<Place>('/places', { place });
-    this.placesState.next([...this.placesState.value, newPlace]);
-    return newPlace;
+  public async fetchTypesOfPlaces(): Promise<void> {
+    const types = await backendAPI.get<TypeOfPlace[]>('/places/types');
+    this.typesOfPlacesState.next(types);
+  }
+
+  public async createNewSpace(creation: PlaceCreation): Promise<Place> {
+    const place = await backendAPI.post<Place>('/places', { place: creation });
+    this.placesState.next([...this.placesState.value, place]);
+    return place;
   }
 
   public async updatePlace(placeId: PlaceId, update: PlaceUpdate): Promise<Place> {
@@ -40,11 +51,20 @@ class PlacesService implements IPlacesServivce {
   public async deletePlace(placeId: PlaceId): Promise<void> {
     await backendAPI.delete(`/places/${placeId}`);
     await this.fetchPlaces();
+    snackbarService.showSnackbar('Place deleted.', 'success');
   }
 
-  public async getPlaceById(id: PlaceId): Promise<Place | null> {
-    await this.fetchComplete;
-    return this.placesState.value.find(p => p.id === id) || null;
+  public async getPlaceById(placeId: PlaceId): Promise<Place | null> {
+    await this.initializationComplete;
+    return this.placesState.value.find(p => p.id === placeId) || null;
+  }
+
+  public async getPlaceTypes(placeId: PlaceId): Promise<TypeOfPlaceId[]> {
+    return backendAPI.get<TypeOfPlaceId[]>(`/places/${placeId}/types`);
+  }
+
+  public async updatePlaceTypes(placeId: PlaceId, types: TypeOfPlaceId[]): Promise<void> {
+    await backendAPI.put(`/places/${placeId}/types`, { types });
   }
 
   public async addPhoto(placeId: PlaceId, data: PhotoCreation): Promise<Photo> {
@@ -57,9 +77,8 @@ class PlacesService implements IPlacesServivce {
     return backendAPI.get<Photo[]>(`/places/${placeId}/photos`);
   }
 
-  public async deletePhoto(placeId: PlaceId, photoId: PhotoId): Promise<boolean> {
-    const response = await backendAPI.delete(`/places/${placeId}/photos/${photoId}`);
-    return response.ok;
+  public async deletePhoto(placeId: PlaceId, photoId: PhotoId): Promise<void> {
+    return await backendAPI.delete(`/places/${placeId}/photos/${photoId}`);
   }
 }
 

@@ -1,7 +1,7 @@
 import { PhotoSize } from './types';
 
 class PhotoHelper {
-  private readonly photoSizes: Record<PhotoSize, number> = {
+  public readonly photoSizes: Record<PhotoSize, number> = {
     'xs': 75,
     'sm': 150,
     'md': 500,
@@ -9,12 +9,16 @@ class PhotoHelper {
     'xl': 1200
   };
 
-  public getPhotoUrl({ key, bucket, size }: { key: string; bucket: string; size: PhotoSize }): string {
-    return `https://${bucket}.oss.nodechef.com/${this.formatKey(key, size)}`;
+  public getPhotoUrl(environment: 'development' | 'production' | 'test', { key, bucket, size }: { key: string; bucket: string; size: PhotoSize }): string {
+    if (environment === 'production') {
+      return `https://${bucket}.oss.nodechef.com/${this.getFileName(key, size)}`;
+    } else {
+      return `http://localhost:3001/public/${bucket}/${this.getFileName(key, size)}`;
+    }
   }
 
-  public formatKey(key: string, size: PhotoSize): string {
-    return `${key}_${size}`;
+  public getFileName(key: string, size: PhotoSize): string {
+    return key.replace('.', `_${size}.`);
   }
 
   /**

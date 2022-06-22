@@ -16,6 +16,9 @@ copySync('server/build', DEPLOY_DIR);
 console.log('✅ copy database migrations');
 copySync('server/migrations', join(DEPLOY_DIR, 'migrations'));
 
+console.log('✅ copy database seeds');
+copySync('server/seeds', join(DEPLOY_DIR, 'seeds'));
+
 console.log('✅ copy admin app to server public folder');
 copySync('web-apps/admin/build', join(DEPLOY_DIR, 'public/admin-app'));
 
@@ -23,9 +26,11 @@ console.log('✅ create server package.json');
 const { dependencies } = JSON.parse(readFileSync('server/package.json', 'utf8'));
 const packageJSON = {
   scripts: {
-    postinstall: 'npm run migrate up',
+    postinstall: 'npm run migrate up && npm run seed',
     start: 'node server.js',
-    migrate: 'node-pg-migrate'
+    migrate: "npm run tsnode -- node_modules/.bin/node-pg-migrate -j ts",
+    seed: "npm run tsnode -- seeds/seeder.ts",
+    tsnode: "NODE_OPTIONS='--abort-on-uncaught-exception' ts-node -r dotenv/config"
   },
   dependencies
 };

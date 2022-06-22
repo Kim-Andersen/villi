@@ -2,218 +2,132 @@ import httpStatus from 'http-status';
 import Koa from 'koa';
 import koaBody from 'koa-body';
 import Router from 'koa-router';
-import { uniq } from 'lodash';
-import db from '../../database';
-import { Place, PlaceCreation, PlaceUpdate } from '../../shared/types';
-import photoService from './photoService';
-import { validatePlaceCreation, validatePlaceUpdate } from './schemas';
+import config from '../../config';
+import { placePhotosRepo, placesRepo, placeTypesRepo } from '../../database/repositories';
+import { BadRequestError } from '../../errors';
+import { placeSearchService, placeService } from '../../services';
+import { Location, PlaceCreation, PlaceUpdate, TypeOfPlaceId } from '../../shared/types';
+import { parsePhotoId, parsePlaceId } from '../utils/parsers';
+import { validatePlaceCreation, validatePlaceTypesUpdate, validatePlaceUpdate } from './schemas';
 
-function sanitizePlaceId(placeId: string): number {
-  return Number(placeId);
-}
+const commaSeparatedCoordinatesRegex = new RegExp(/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/);
 
 const router = new Router({
   prefix: '/places'
 });
 
-router.get('/', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
-  try {
-    const res = await db.query(`SELECT *, ST_AsGeoJSON(location)::json->'coordinates' as coordinates FROM places ORDER BY id ASC`);
-    ctx.body = { places: res.rows };
-    ctx.status = httpStatus.OK;
-    await next();
-  } catch (err) {
-    if (err instanceof Error) {
-      console.log(err.stack);
-    } else {
-      console.log(err);
-    }
-  }
-});
-
-router.post('/', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
-  const placeCreation = <Partial<Place>>ctx.request.body as PlaceCreation;
-
-  const valid = validatePlaceCreation(placeCreation);
-  if (!valid) {
-    ctx.status = httpStatus.BAD_REQUEST;
-    ctx.body = validatePlaceCreation.errors;
-    return await next();
+/**
+ * Search nearby places.
+ * 
+ * Ex: Search places near latitude 46.53288741 and longitude 6.612212468, within a radius of 1000 meters:
+ * /places/nearbysearch?location=46.53288741,6.612212468&radius=1000
+ */
+router.get('/nearbysearch', async (ctx: Koa.Context) => {
+  // Validate "location" query parameter.
+  if (!commaSeparatedCoordinatesRegex.test((String(ctx.query.location)))) {
+    ctx.throw(new BadRequestError(`Missing or invalid location parameter ${ctx.query.location}. Required format: location=[latitude],[longitude].`));
   }
 
-  const query = `
-    INSERT INTO places(name,description,street_name,street_number,postal_code,city,location)
-    VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`;
-  const { name, description, street_name, street_number, postal_code, city, coordinates } = placeCreation;
-  const params = [
-    name ?? 'New place',
-    description ?? '',
-    street_name ?? '',
-    street_number ?? '0',
-    postal_code ?? '',
-    city ?? '',
-    coordinates ? `POINT(${coordinates[0]} ${coordinates[1]})` : `POINT(46.5281434 6.6089567)`
-  ];
-
-  try {
-    const result = await db.query(query, params);
-    ctx.body = result.rows[0];
-    ctx.status = httpStatus.CREATED;
-  } catch (err) {
-    if (err instanceof Error) {
-      ctx.body = { error: err.stack };
-      console.log(err.stack);
-    } else {
-      console.log(err);
-      ctx.body = { error: err };
-    }
+  // Validate location "radius" parameter.
+  const radius = Number(ctx.query.radius);
+  if (isNaN(radius) || radius < 1000 || radius > 50000) {
+    ctx.throw(new BadRequestError(`Missing or invalid radius parameter ${ctx.query.radius}. Must be an integer between 1000 and 50000.`));
   }
   
-  await next();
+  ctx.assert(typeof ctx.query.location === 'string');
+  ctx.assert(typeof radius === 'number');
+
+  const latLng = ctx.query.location.split(',');
+  const location: Location = {
+    latitude: Number.parseFloat(latLng[0]),
+    longitude: Number.parseFloat(latLng[1])
+  };
+  
+
+  ctx.body = await placeSearchService.nearby(location, radius);
+  ctx.status = httpStatus.OK;
 });
 
-router.put('/:placeId', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
-  const placeId = sanitizePlaceId(ctx.params.placeId);
+router.get('/', async (ctx: Koa.Context) => {
+  ctx.body = await placesRepo.findPlaces();
+  ctx.status = httpStatus.OK;
+});
+
+router.post('/', async (ctx: Koa.Context, next: Koa.Next) => {
+  const placeCreation = ctx.request.body.place as PlaceCreation;
+  
+  if (!validatePlaceCreation(placeCreation)) {
+    ctx.throw(new BadRequestError('Missing or invalid values', { validationErrors: validatePlaceCreation.errors }));
+  }
+
+  ctx.body = await placeService.create(placeCreation);
+  ctx.status = httpStatus.CREATED;
+});
+
+router.put('/:placeId', async (ctx: Koa.Context) => {
   const placeUpdate = ctx.request.body.place as PlaceUpdate;
 
-  const valid = validatePlaceUpdate(placeUpdate);
-  if (!valid) {
-    ctx.status = httpStatus.BAD_REQUEST;
-    ctx.body = validatePlaceUpdate.errors;
-    return await next();
+  if (!validatePlaceUpdate(placeUpdate)) {
+    ctx.throw(new BadRequestError('Place update error', { validationErrors: validatePlaceUpdate.errors }));
   }
 
-  const columnValues: Array<{ column: keyof PlaceUpdate | 'location', value: string }> = [];
-  columnValues.push({ column: 'name', value: placeUpdate.name });
-  columnValues.push({ column: 'description', value: placeUpdate.description });
-  columnValues.push({ column: 'street_name', value: placeUpdate.street_name });
-  columnValues.push({ column: 'street_number', value: placeUpdate.street_number });
-  columnValues.push({ column: 'postal_code', value: placeUpdate.postal_code });
-  columnValues.push({ column: 'city', value: placeUpdate.city });
-  if (placeUpdate.coordinates) {
-    columnValues.push({ column: 'location', value: `POINT(${placeUpdate.coordinates[0]} ${placeUpdate.coordinates[1]})` });
-  }
-
-  const sets = columnValues.map((x, index) => `"${x.column}"=$${index+1}`).join(',');
-  const params = columnValues.map(x => x.value);
-  const query = `UPDATE places SET ${sets}, "updated_at"=NOW() WHERE id = ${placeId}`;
-
-  console.log('query', query);
-  console.log('params', params);
-  
-  await db.query(query, params);
-  
-  ctx.body = placeUpdate;
+  ctx.body = await placeService.update(placeUpdate);
   ctx.status = httpStatus.OK;
-  await next();
 });
 
-router.delete('/:placeId', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
-  const placeId = sanitizePlaceId(ctx.params.placeId);
-
-  try {
-    const result = await db.query(`DELETE FROM places WHERE id = ${placeId}`);
-    if (result.rowCount === 1) {
-      ctx.status = httpStatus.OK;
-      ctx.body = { status: httpStatus.OK, message: `Place id ${placeId} was deleted.` };
-    } else {
-      ctx.status = httpStatus.NOT_FOUND;
-      ctx.body = { status: httpStatus.NOT_FOUND, message: `Place id ${placeId} not found.` };
-    }
-  } catch (err) {
-    console.log(`Failed to delete place id ${placeId}`, err);
-    ctx.status = httpStatus.INTERNAL_SERVER_ERROR;
-  }
-  await next();
+router.delete('/:placeId', async (ctx: Koa.Context) => {
+  await placeService.delete(parsePlaceId(ctx.params.placeId));
+  ctx.status = httpStatus.OK;  
+  ctx.body = {};
 });
 
-/**
- * Add photos to a place.
- */
 router.post(
   '/:placeId/photos', 
-  koaBody({ multipart: true, formidable: { uploadDir: './uploads' } }), 
-  async (ctx: Koa.Context, next: () => Promise<unknown>) => {
-  const placeId = sanitizePlaceId(ctx.params.placeId);
+  koaBody({ multipart: true, formidable: { uploadDir: config.uploadDir } }), 
+  async (ctx: Koa.Context) => {
+  const placeId = parsePlaceId(ctx.params.placeId);
 
   if (ctx.request.files === undefined || ctx.request.files.file === undefined) {
-    ctx.status = httpStatus.BAD_REQUEST;
-    ctx.body = { error: { message: 'No file found.' } };
-    return await next();  
+    ctx.throw(new BadRequestError('No file in request'));
   };
 
   const filePath = (ctx.request.files.file as any).filepath;
   const contentType = (ctx.request.files.file as any).mimetype;
 
-  try {
-    const photo = await photoService.addPhoto({ bucket: 'villi-photos', filePath, contentType, sizes: ['sm', 'md'] });
-    await db.query(`INSERT INTO place_photos(place_id, photo_id) VALUES($1,$2)`, [placeId, photo.id])
-    ctx.status = httpStatus.OK;
-    ctx.body = photo;
-  } catch (error) {
-    console.log(`Failed to add photo to place id ${placeId}`, error);
-    ctx.status = httpStatus.INTERNAL_SERVER_ERROR;
+  ctx.body = await placeService.addPhoto(placeId, filePath, contentType);
+  ctx.status = httpStatus.OK;
+});
+
+router.get('/:placeId/photos', async (ctx: Koa.Context) => {
+  ctx.body = await placePhotosRepo.findForPlace(parsePlaceId(ctx.params.placeId));
+  ctx.status = httpStatus.OK;
+});
+
+router.delete('/:placeId/photos/:photoId', async (ctx: Koa.Context) => {
+  ctx.body = await placeService.deletePhoto(parsePlaceId(ctx.params.placeId), parsePhotoId(ctx.params.photoId));
+  ctx.status = httpStatus.OK;
+});
+
+router.get('/:placeId/types', async (ctx: Koa.Context) => {
+  ctx.body = await placeTypesRepo.findByPlace(parsePlaceId(ctx.params.placeId));
+  ctx.status = httpStatus.OK;
+});
+
+router.put('/:placeId/types', async (ctx: Koa.Context) => {
+  if (!validatePlaceTypesUpdate(ctx.request.body)) {
+    throw new BadRequestError('Place update error', { validationErrors: validatePlaceTypesUpdate.errors });
   }
-
-  await next();
-});
-
-router.get('/:placeId/photos', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
-  const placeId = sanitizePlaceId(ctx.params.placeId);
-  const query = `
-    select p.id, p.created_at, p.key, p.bucket, p.type, to_json(p.sizes) as sizes
-    from photos p inner join place_photos pp on pp.photo_id = p.id 
-    where pp.place_id = ${placeId}`;
-  const result = await db.query(query);
-
-  ctx.body = result.rows;
+  
+  const types = ctx.request.body.types as TypeOfPlaceId[];
+  await placeTypesRepo.upsertForPlace(parsePlaceId(ctx.params.placeId), types);
+  
   ctx.status = httpStatus.OK;
-  await next();
-});
-
-router.delete('/:placeId/photos/:photoId', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
-  // const placeId = sanitizePlaceId(ctx.params.placeId);
-  const photoId = Number(ctx.params.photoId);
-  const deleted = await photoService.deletePhoto(photoId);
-
-  if (deleted) {
-    ctx.status = httpStatus.OK;
-  } else {
-    ctx.status = httpStatus.NOT_FOUND;
-  }
   ctx.body = {};
-  await next();
 });
 
-router.get('/:placeId/types', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
-  const placeId = sanitizePlaceId(ctx.params.placeId);
-
-  const query = `
-    SELECT top.id
-    FROM types_of_places top INNER JOIN place_types pt on pt.type_id = top.id 
-    WHERE pt.place_id = ${placeId}`;
-  const result = await db.query(query);
-  ctx.body = result.rows;
+router.get('/types', async (ctx: Koa.Context) => {
+  ctx.body = await placeTypesRepo.find();
   ctx.status = httpStatus.OK;
-  await next();
-});
-
-router.post('/:placeId/types', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
-  const placeId = sanitizePlaceId(ctx.params.placeId);
-  const types = uniq(ctx.request.body.types) as number[];
-
-  await db.transaction([
-    {
-      query: `DELETE FROM place_types WHERE place_id = ${placeId}`
-    },
-    {
-      query: `INSERT INTO place_types (place_id, type_id) VALUES ${types.map(id => `(${placeId}, ${id})`)}`
-    }
-  ])
-
-  ctx.body = {};
-  ctx.status = httpStatus.OK;
-  await next();
 });
 
 export default router;

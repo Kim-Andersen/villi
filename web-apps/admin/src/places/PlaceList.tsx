@@ -14,6 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { useObservableGetState } from 'observable-hooks';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { placeCreationDefaults } from '../shared/constants';
 import { Place } from '../shared/types';
 import NewPlaceDialog from './NewPlaceDialog';
 import placesService from './placesService';
@@ -27,7 +28,7 @@ export default function PlaceList() {
     setShowNewPlaceDialog(false);
     if (name) {
       try {
-        const place = await placesService.createNewSpace({ name });
+        const place = await placesService.createNewSpace(Object.assign({}, placeCreationDefaults, { name }));
         navigate(`${place.id}`);
       } catch(error) {
         alert(JSON.stringify(error));

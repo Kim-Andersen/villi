@@ -1,21 +1,23 @@
 import HttpStatus from 'http-status';
 import Koa from 'koa';
 import Router from 'koa-router';
-import geo from './geo';
-import places from './places';
-import users from './users';
+import { errorHandler } from './errorHandler';
+import geoAPI from './geo';
+import placesAPI from './places';
+import usersAPI from './users';
 
 const app = new Koa();
 const router = new Router();
 
+app.use(errorHandler);
 app.use(router.routes())
 app.use(router.allowedMethods());
-app.use(users.routes());
-app.use(places.routes());
-app.use(geo.routes());
+app.use(usersAPI.routes());
+app.use(placesAPI.routes());
+app.use(geoAPI.routes());
 
-router.get('/', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
-  ctx.body = { message: 'Welcome to the p API!' };
+router.get('/', async (ctx: Koa.Context, next: Koa.Next) => {
+  ctx.body = { message: 'Welcome to the Villi API.' };
   ctx.status = HttpStatus.OK;
   await next();
 });

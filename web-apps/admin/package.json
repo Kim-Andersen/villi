@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "/admin",
   "scripts": {
-    "start": "PORT=3002 BROWSER=scripts/start.js react-app-rewired start",
+    "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",

@@ -7,7 +7,7 @@ const router = new Router();
 /** Routes */
 app.use(router.routes()).use(router.allowedMethods());
 
-router.get('/', async (ctx: Koa.Context, next: () => Promise<unknown>) => {
+router.get('/', async (ctx: Koa.Context, next: Koa.Next) => {
   ctx.type = 'html';
   ctx.body = `
     <html>

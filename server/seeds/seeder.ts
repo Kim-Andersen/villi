@@ -1,4 +1,4 @@
-import { readFile } from 'fs-extra';
+import { readFileSync } from 'fs';
 import { join, normalize } from 'path';
 import { Pool } from 'pg';
 
@@ -52,9 +52,9 @@ const pool = new Pool({
 });
 
 async function getSeeds(): Promise<Array<Seed>> {  
-  const seeds: string[] = JSON.parse(await readFile(normalize(join(__dirname, 'seeds.json')), 'utf-8'));
+  const seeds: string[] = JSON.parse(readFileSync(normalize(join(__dirname, 'seeds.json')), 'utf-8'));
   return Promise.all(seeds.map(async file => {
-    const query = await readFile(normalize(join(__dirname, file)), 'utf-8');
+    const query = readFileSync(normalize(join(__dirname, file)), 'utf-8');
     return {
       file,
       query

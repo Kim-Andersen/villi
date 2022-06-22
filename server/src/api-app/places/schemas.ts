@@ -1,14 +1,12 @@
 import Ajv, { JSONSchemaType } from 'ajv';
-import AjvErrors from 'ajv-errors';
 import { PlaceRules } from '../../shared/constants';
-import { PlaceCreation, PlaceUpdate } from '../../shared/types';
+import { PlaceCreation, PlaceTypesUpdate, PlaceUpdate } from '../../shared/types';
 
 const ajv = new Ajv({ allErrors: true });
-AjvErrors(ajv);
 
 export const placeCreationSchema: JSONSchemaType<PlaceCreation> = {
   type: "object",
-  required: ["name"],
+  required: ["name", "description", "street_name", "street_number", "postal_code", "city", "coordinates"],
   additionalProperties: false,
   properties: {
     name: { type: "string", "minLength": 1, "maxLength": PlaceRules.name.maxLength },
@@ -18,12 +16,6 @@ export const placeCreationSchema: JSONSchemaType<PlaceCreation> = {
     postal_code: { type: "string", "minLength": 1, "maxLength": PlaceRules.postal_code.maxLength },
     city: { type: "string", "minLength": 1, "maxLength": PlaceRules.city.maxLength },
     coordinates: { type: "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } }
-  },
-  errorMessage: {
-    properties: {
-      name: "Name should be a text with length >= 1 and <= 100",
-      description: "Description should be a text with length >= 1 and <= 500",
-    },
   }
 }
 export const validatePlaceCreation = ajv.compile(placeCreationSchema);
@@ -41,12 +33,21 @@ export const placeUpdateSchema: JSONSchemaType<PlaceUpdate> = {
     postal_code: { type: "string", "minLength": 1, "maxLength": PlaceRules.postal_code.maxLength },
     city: { type: "string", "minLength": 1, "maxLength": PlaceRules.city.maxLength },
     coordinates: { type: "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } }
-  },
-  errorMessage: {
-    properties: {
-      name: "Name should be a text with length >= 1 and <= 100",
-      description: "Description should be a text with length >= 1 and <= 500",
-    },
-  },
+  }
 }
 export const validatePlaceUpdate = ajv.compile(placeUpdateSchema);
+
+export const placeTypesUpdateSchema: JSONSchemaType<PlaceTypesUpdate> = {
+  type: "object",
+  required: ["types"],
+  additionalProperties: false,
+  properties: {
+    types: {
+      type: "array",
+      minItems: 1,
+      items: { "type": "integer" },
+      uniqueItems: true
+    }
+  }
+};
+export const validatePlaceTypesUpdate = ajv.compile(placeTypesUpdateSchema);
