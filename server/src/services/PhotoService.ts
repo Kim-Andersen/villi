@@ -1,7 +1,7 @@
 import debug from 'debug';
 import { unlink } from 'fs-extra';
 import sharp from 'sharp';
-import { IPhotosRepo } from '../database/repositories/PhotosRepo';
+import { IPhotosRepo } from '../repositories/PhotosRepo';
 import photoHelper from '../shared/photoHelper';
 import { Photo, PhotoId } from '../shared/types';
 import { IObjectStorage } from './types';
@@ -90,6 +90,6 @@ export default class PhotoService implements IPhotoService {
       return this.objectStorage.deleteObject(bucket, photoHelper.getFileName(key, size));
     }));
 
-    await this.photosRepo.deleteById(photo.id);
+    await this.photosRepo.deleteById(photo.id as PhotoId);
   }
 }

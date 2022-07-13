@@ -19,18 +19,20 @@ type StaticMapImageOptions = {
   markCenter: boolean;
   size: Size; 
   zoom: number; 
-  markers?: Array<Marker> 
+  markers: Array<Marker> 
 };
 
 const defaultOptions: StaticMapImageOptions = { 
   markCenter: true,
   size: { width: 400, height: 300 }, 
-  zoom: 16
+  zoom: 15,
+  markers: []
 };
 
-export default function getStaticMapUrl(center: LatLng, { markCenter, size, zoom, markers }: StaticMapImageOptions = defaultOptions): string {
+export default function getStaticMapUrl(center: LatLng, options: Partial<StaticMapImageOptions> = {}): string {
+  const { markCenter, size, zoom, markers } = Object.assign({}, options, defaultOptions) as StaticMapImageOptions;
+
   if (markCenter) {
-    markers = markers || [];
     markers.push({ location: center, label: 'C' });
   }
   

@@ -8,12 +8,8 @@ import serveStatic from 'koa-static';
 import { join, normalize } from 'path';
 import { apiApp } from './api-app';
 import config from './config';
-import db from './database';
+import { pool } from './database';
 import { webApp } from './web-app';
-
-console.log('process.env.ROOT_URL', process.env.ROOT_URL);
-console.log('config.publicDir', config.publicDir);
-console.log('config.uploadDir', config.uploadDir);
 
 if (!existsSync(config.uploadDir)) {
   mkdirSync(config.uploadDir);
@@ -25,15 +21,16 @@ serverApp.use(logger());
 serverApp.use(cors());
 serverApp.use(koaBody());
 serverApp.use(mount('/public', serveStatic(config.publicDir)));
+serverApp.use(mount('/admin', serveStatic(normalize(join(config.publicDir, '/admin-app')))));
 serverApp.use(mount('/', webApp)); // Start with the "/" route so it doesn't catch all routes.
 serverApp.use(mount('/api', apiApp));
-serverApp.use(mount('/admin/.*/', serveStatic(normalize(join(config.publicDir, '/admin-app')))));
+
 
 async function startServer() {
   // Test database connection.
   try {
     console.log(`Connecting to database...`);
-    await db.testConnection();
+    await pool.query(`SELECT NOW()`);
     console.log('✅  Connected to database');
   } catch (error) {
     console.error('Failed to connect to database:');

@@ -11,6 +11,7 @@
     "declaration": true,
     "skipLibCheck": false,
     "noImplicitAny": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "strictNullChecks": true
   }
 }

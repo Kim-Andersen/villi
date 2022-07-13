@@ -1,7 +1,7 @@
 import { GoogleMap, useLoadScript } from '@react-google-maps/api';
 import React from 'react';
 
-export const GOOGLE_MAPS_API_KEY = 'AIzaSyAA_2GU7JHv1BaGCkaXVZ07vRNKs2eBtS8';
+export const GOOGLE_MAPS_API_KEY = 'AIzaSyCtuJlhkoash5SoV5k2VZsmV7e3LXL4UOw';
 
 type MapProps = {
   center: {

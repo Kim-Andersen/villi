@@ -1,9 +1,10 @@
-import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
-import config from '../config';
+import { BehaviorSubject } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs/operators';
 import { APIResponse } from '../shared/types';
-import { HttpMethod } from './types';
+import { APIRequestError } from './APIRequestError';
+import { HttpMethod, IBackendAPI } from './types';
 
-class BackendAPI {
+class BackendAPI implements IBackendAPI {
   private workingState = new BehaviorSubject<boolean>(false);
   public working = this.workingState.asObservable().pipe(distinctUntilChanged());
   
@@ -57,12 +58,15 @@ class BackendAPI {
       }
       throw response;
     } catch(error) {
-      const message = error instanceof Error ? error.message : error;
-      throw new Error(`API request error: ${message}`);
+      if (error instanceof Response) {
+        throw new APIRequestError(error);
+      } else {
+        throw error;
+      }
     } finally {
       this.workingState.next(false);
     }
   }
 }
 
-export const backendAPI = new BackendAPI(config.serverRootURL + '/api');
+export const backendAPI = new BackendAPI('/api');

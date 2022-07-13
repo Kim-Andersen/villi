@@ -18,8 +18,6 @@ export class S3ObjectStorage implements IObjectStorage {
       endpoint: config.nodechef.objectStorage.endpoint
       // region: config.nodechef.objectStorage.endpoint
     });
-
-    this.ensureBucket('villi-photos');
   }
 
   public async uploadObject(bucket: string, key: string, contentType: string, body: Buffer): Promise<void> {

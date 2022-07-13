@@ -1,0 +1,6 @@
+{
+  "name": "villi-shared",
+  "devDependencies": {
+    "zod": "^3.17.3"
+  }
+}

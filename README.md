@@ -50,3 +50,21 @@ Nodechef Object Storage credentials:
 
 A `NC_DEPLOY_TOKEN` environment variable must be added to Travis environment variables.
 This is used to [deploy builds to Nodechef](https://www.nodechef.com/docs/node/deploy).
+
+## Admin app
+
+### Proxy
+
+In order to be able to do `fetch(/api/places)` and because the development server API is running on a different port,
+the `proxy` field in the `package.json` file proxies such requests to the correct port:
+
+```json
+"proxy": "http://localhost:3001"
+```
+
+Learn more:
+https://create-react-app.dev/docs/proxying-api-requests-in-development/
+
+
+
+

@@ -4,7 +4,7 @@ import IconButton from '@mui/material/IconButton';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import config from '../config';
 import photoHelper from '../shared/photoHelper';
@@ -16,14 +16,15 @@ import UploadPhoto from './UploadPhoto';
 export default function EditPlacePhotos(): React.ReactElement {  
   const placeId = Number(useParams<keyof { placeId: PlaceId }>().placeId);
   const [photos, setPhotos] = useState<Photo[] | null>(null);
-  
-  async function fetchPhotos() {
+
+  const fetchPhotos = useCallback(async () => {
     return placesService.getPhotos(placeId).then(photos => setPhotos(photos));
-  }
+  }, [placeId]);
+  
 
   useEffect(() => {
     fetchPhotos();
-  }, [placeId]);
+  }, [placeId, fetchPhotos]);
 
   async function addPhoto(file: File): Promise<void> {
     try {
@@ -55,7 +56,7 @@ export default function EditPlacePhotos(): React.ReactElement {
               <ImageListItemBar
                 title={`#${id}`}
                 actionIcon={
-                  <IconButton aria-label="delete" sx={{ color: 'white' }} onClick={() => handleDeletePhoto(id)}>
+                  <IconButton aria-label="delete" sx={{ color: 'white' }} onClick={() => handleDeletePhoto(id as PhotoId)}>
                     <DeleteIcon />
                   </IconButton>
                 }

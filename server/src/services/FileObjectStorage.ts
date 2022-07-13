@@ -9,12 +9,10 @@ export class FileObjectStorage implements IObjectStorage {
 
   constructor() {
     this.log = debug(FileObjectStorage.name);
-    this.ensureBucket('villi-photos');
   }
 
   public async uploadObject(bucket: string, key: string, contentType: string, buffer: Buffer): Promise<void> {
     this.log('uploadObject', { bucket, key, contentType });
-    await this.ensureBucket('villi-photos');
     await createWriteStream(this.getFilePath(bucket, key)).write(buffer);
   }
 

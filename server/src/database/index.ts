@@ -1,62 +1,38 @@
 import debug from 'debug';
-import { Pool, QueryResult } from 'pg';
+import { Generated, Kysely, PostgresDialect } from 'kysely';
+import { Pool } from 'pg';
 import config from '../config';
-import { IDatabase, TransactionQuery } from './types';
+import { Tables } from '../shared/generated/db';
 
-const pool = new Pool({
-  connectionString: config.postgres.connectionString
+/**
+ * Sets `Generated<T>` for `id` and `created_at` properties so they work correctly with kysely's type system.
+ * 
+ * https://github.com/koskimas/kysely#minimal-example
+ */
+type WithKyselyGeneratedType<T extends object> = {
+  [K in keyof T]: K extends 'id'  ? Generated<number> 
+    : K extends 'created_at' ? Generated<Date>
+    : T[K];
+};
+
+type Kyselyfy<T extends {[key: string]: any}> = {
+  [K in keyof T]: WithKyselyGeneratedType<T[K]>
+};
+
+export type Database = Kysely<Kyselyfy<Tables>>;
+
+const log = debug('database');
+
+export const pool = new Pool({
+  connectionString: config.postgres.connectionString,
 });
 
-pool.connect
-
-pool.on('error', err => {
-  console.error('Unexpected error on idle client', err)
-  process.exit(-1)
-});
-
-class Database implements IDatabase {
-  private readonly log: debug.Debugger;
-
-  constructor() {
-    this.log = debug(Database.name);
-  }
-
-  public async testConnection(): Promise<boolean> {
-    const client = await pool.connect()
-    await client.query('SELECT NOW()')
-    client.release()
-    return true;
-  }
-
-  public async query<Type>(query: string, params?: any[]): Promise<QueryResult<Type>> {
-    const start = Date.now();
-    const result = await pool.query(query, params);
-    const duration = `${Date.now() - start} ms`;
-    this.log('executed query', { query, rows: result.rowCount, duration });
-    return result;
-  }
-
-  public async transaction(queries: Array<TransactionQuery>): Promise<void> {
-    const start = Date.now();
-    const client = await pool.connect();
-
-    try {
-      await client.query('BEGIN');
-
-      for (const { query, params } of queries) {
-        await this.query(query, params);
-      }
-
-      const duration = `${Date.now() - start} ms`;
-      this.log('Executed transaction', { duration, queryCount: queries.length });
-    } catch (e) {
-      await client.query('ROLLBACK');
-      throw e;
-    } finally {
-      client.release();
+export const database: Database = new Kysely<Kyselyfy<Tables>>({
+  dialect: new PostgresDialect({ pool }),
+  log: (event): void => {  
+    if (event.level === 'query') {
+      log(event.query.sql)
+      log(event.query.parameters)
     }
   }
-}
-
-const database = new Database();
-export default database;
+});
