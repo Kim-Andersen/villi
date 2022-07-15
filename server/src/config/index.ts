@@ -12,16 +12,7 @@ export default {
     objectStorage: {
       accessKey: getEnvVar('NC_OBJECT_STORAGE_KEY'),
       secretAccessKey: getEnvVar('NC_OBJECT_STORAGE_SECRET_KEY'),
-      endpoint: getEnvVar('NC_OBJECT_STORAGE_ENDPOINT'),
-      region: 'eu-west-1'
-    }
-  },
-  locationiq: {
-    apiKey: getEnvVar('LOCATIONIQ_API_KEY')
-  },
-  google: {
-    maps: {
-      apiKey: getEnvVar('GOOGLE_MAPS_API_KEY')
+      endpoint: getEnvVar('NC_OBJECT_STORAGE_ENDPOINT')
     }
   }
 };
