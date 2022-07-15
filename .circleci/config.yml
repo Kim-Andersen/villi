@@ -1,0 +1,38 @@
+dist: xenial
+language: node_js
+
+node_js:
+  - 14
+
+addons:
+  postgresql: '11'
+  apt:
+    packages:
+      - postgresql-11-postgis-3
+      - postgresql-client-11
+
+env:
+  global:
+    - PGPORT=5433
+    - PGUSER=travis
+
+before_install:
+  - sudo sed -i -e "/local.*peer/s/postgres/all/" -e "s/peer\|md5/trust/g" /etc/postgresql/*/main/pg_hba.conf
+  - postgres --version
+  - sudo pg_ctlcluster 11 main restart
+
+cache:
+  directories:
+    - node_modules
+
+before_script:
+  - psql -Utravis -p5433 -c 'create database travis_ci_test;'
+  - psql -p5433 -c "SELECT version();"
+  - psql -Utravis -c "CREATE EXTENSION postgis"
+  - npm install -g nodechef-cli
+  - npm run setup
+  - npm run build
+  - npm run prepare-server-deploy
+
+after_script:
+  - nodechef deploy -i villi -auth ${NC_DEPLOY_TOKEN} -l server/deploy --rebuild
