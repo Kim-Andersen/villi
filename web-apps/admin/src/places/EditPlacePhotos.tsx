@@ -10,7 +10,6 @@ import config from '../config';
 import photoHelper from '../shared/photoHelper';
 import { Photo, PhotoId, PlaceId } from '../shared/types';
 import snackbarService from '../snackbar/snackbarService';
-import placesService from './placesService';
 import UploadPhoto from './UploadPhoto';
 
 export default function EditPlacePhotos(): React.ReactElement {  
@@ -18,8 +17,8 @@ export default function EditPlacePhotos(): React.ReactElement {
   const [photos, setPhotos] = useState<Photo[] | null>(null);
 
   const fetchPhotos = useCallback(async () => {
-    return placesService.getPhotos(placeId).then(photos => setPhotos(photos));
-  }, [placeId]);
+    // return placesService.getPhotos(placeId).then(photos => setPhotos(photos));
+  }, [/*placeId*/]);
   
 
   useEffect(() => {
@@ -28,7 +27,7 @@ export default function EditPlacePhotos(): React.ReactElement {
 
   async function addPhoto(file: File): Promise<void> {
     try {
-      await placesService.addPhoto(placeId, { file: file, contentType: file.type });
+      // await placesService.addPhoto(placeId, { file: file, contentType: file.type });
       snackbarService.showSnackbar('Photo added.', 'success');
       fetchPhotos();
     } catch (error) {
@@ -38,14 +37,14 @@ export default function EditPlacePhotos(): React.ReactElement {
   }
 
   async function handleDeletePhoto(photoId: PhotoId) {
-    await placesService.deletePhoto(placeId, photoId);
+    // await placesService.deletePhoto(placeId, photoId);
     snackbarService.showSnackbar('Photo was deleted', 'info');
     await fetchPhotos();
   }
 
   return (
     <React.Fragment>
-      <UploadPhoto onUpload={addPhoto} disabled={placesService.isWorking} />
+      <UploadPhoto onUpload={addPhoto} disabled={false/*placesService.isWorking*/} />
       
       {photos && <ImageList variant='quilted' sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
         {photos.map(({ id, key, bucket, sizes }) => {

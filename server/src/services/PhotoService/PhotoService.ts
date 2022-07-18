@@ -4,7 +4,7 @@ import sharp from 'sharp';
 import { IEntityPhotoModel, IPhotoModel } from '../../models';
 import { EntityPhoto, EntityPhotoInput, EntityType, Photo, PhotoId, photoInputSchema, PhotoSize } from '../../shared';
 import photoHelper from '../../shared/photoHelper';
-import { IObjectStorage } from '../types';
+import { IObjectStorage } from '../ObjectStorage/types';
 
 export default class PhotoService {
   private readonly bucket = 'photos';
@@ -19,19 +19,36 @@ export default class PhotoService {
     this.objectStorage.ensureBucket(this.bucket);
   }
 
+  /**
+   * Finds all photos associated to an entity, ie. a vendor or a location.
+   */
   public findAllEntityPhotos(entity_id: number, entity_type: EntityType): Promise<Photo[]> {
     this.log('findAllEntityPhotos', { entity_id, entity_type });
     return this.entityPhotoModel.findAllEntityPhotos(entity_id, entity_type);
   }
   
+  /**
+   * Associate a photo to an entity, ie. a vendor or a location.
+   */
   public async addPhotoToEntity(input: EntityPhotoInput): Promise<EntityPhoto> {
     this.log('addPhotoToEntity', { input });
     return this.entityPhotoModel.insert(input);
   
   }
+
+  /**
+   * Remove a photo from an entity, ie. a vendor or a location.
+   */
   public async removePhotoFromEntity(input: EntityPhotoInput): Promise<void> {
     this.log('removePhotoFromEntity', { input });
-    return this.entityPhotoModel.delete(input);
+
+    await this.entityPhotoModel.delete(input);
+
+    // Delete photo if has no entities referencing it.
+    if (await (this.entityPhotoModel.countPhotoEntities(input.photo_id as PhotoId)) === 0) {
+      this.log('Deleting photo as no entities are referencing it.', { photo_id: input.photo_id })
+      await this.deletePhoto(input.photo_id as PhotoId);
+    }
   }
 
   public async addPhoto(filePath: string, { content_type }: { content_type: string }): Promise<Photo> {

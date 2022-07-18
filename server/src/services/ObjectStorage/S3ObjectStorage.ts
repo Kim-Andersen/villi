@@ -1,7 +1,7 @@
 import { AWSError } from 'aws-sdk';
 import S3 from 'aws-sdk/clients/s3';
 import debug from 'debug';
-import config from '../config';
+import config from '../../config';
 import { IObjectStorage } from './types';
 
 export class S3ObjectStorage implements IObjectStorage {

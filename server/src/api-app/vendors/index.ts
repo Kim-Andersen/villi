@@ -34,7 +34,7 @@ router.get('/:vendorId', async (ctx: Koa.Context) => {
 
 router.put('/:vendorId', async (ctx: Koa.Context) => {
   const vendorId = parseId<VendorId>(ctx.params.vendorId);
-  const input = await vendorInputSchema.parseAsync(ctx.body);
+  const input = await vendorInputSchema.parseAsync(ctx.request.body);
   log('update vendor', { vendorId, input });
 
   ctx.body = await vendorService.updateVendor(vendorId, input);

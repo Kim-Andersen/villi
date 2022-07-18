@@ -46,4 +46,5 @@ export interface IEntityPhotoModel {
   findAllEntityPhotos(entity_id: number, entity_type: EntityType): Promise<Photo[]>;
   insert(input: EntityPhotoInput): Promise<EntityPhoto>;
   delete(input: EntityPhotoInput): Promise<void>;
+  countPhotoEntities(photo_id: PhotoId): Promise<number>;
 }
