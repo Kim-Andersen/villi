@@ -2,17 +2,18 @@ import debug from 'debug';
 import { BadRequestError } from '../../errors';
 import { IVendorLocationModel, IVendorModel } from '../../models';
 import { Vendor, VendorId, VendorInput, VendorLocation, VendorLocationDetails, VendorLocationId, VendorLocationInput, VendorLocationSearch } from '../../shared';
+import { IPhotoService } from '../PhotoService/types';
 
 export class VendorService {
   private readonly log = debug(VendorService.name);
   
-  constructor(private readonly vendorModel: IVendorModel, private readonly vendorLocationModel: IVendorLocationModel) {
+  constructor(
+    private readonly vendorModel: IVendorModel,
+    private readonly vendorLocationModel: IVendorLocationModel,
+    private readonly photoService: IPhotoService
+    ) {
     this.log('initialize');
   }
-
-  // public async updateVendorLocation(vendorId: VendorId, locationId: LocationId, update: VendorLocationInput): Promise<void> {
-  //   return this.vendorModel.updateVendorLocation(vendorId, locationId, update);
-  // }
 
   public async updateVendor(vendorId: VendorId, input: VendorInput): Promise<Pick<Vendor, 'updated_at'>> {
     this.log('updateVendor', { vendorId, input });
@@ -68,6 +69,12 @@ export class VendorService {
 
   public async deleteVendor(vendorId: VendorId): Promise<void> {
     this.log('deleteVendor', { vendorId });
+
+    // TODO: This is a big procedure which should be queued to a background task.
+
+    // Delete all vendor photos.
+    await this.photoService.removeAllEntityPhotos('vendor', vendorId);
+
     return this.vendorModel.deleteVendor(vendorId);
   }
 }

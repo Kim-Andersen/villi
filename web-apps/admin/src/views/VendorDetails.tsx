@@ -25,8 +25,10 @@ export default function VendorDetails(): React.ReactElement {
   }, [vendorId]);
 
   async function onDeleteClick() {
-    await vendorService.deleteVendor(vendorId);
-    navigate('/');
+    if (window.confirm('Sure you want to permanantly delete this vendor?')) {
+      await vendorService.deleteVendor(vendorId);
+      navigate('/vendors');
+    }
   }
 
   useEffect(() => {

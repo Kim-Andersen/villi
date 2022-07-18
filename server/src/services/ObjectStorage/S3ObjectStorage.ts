@@ -1,7 +1,7 @@
 import { AWSError } from 'aws-sdk';
 import S3 from 'aws-sdk/clients/s3';
 import debug from 'debug';
-import config from '../config';
+import config from '../../config';
 import { IObjectStorage } from './types';
 
 export class S3ObjectStorage implements IObjectStorage {
@@ -39,7 +39,7 @@ export class S3ObjectStorage implements IObjectStorage {
     }
   }
 
-  public async deleteObject(key: string, bucket: string): Promise<void> {
+  public async deleteObject(bucket: string, key: string): Promise<void> {
     const params: S3.DeleteObjectRequest = {
       Key: key,
       Bucket: bucket

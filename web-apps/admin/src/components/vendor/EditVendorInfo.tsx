@@ -14,8 +14,8 @@ import TimeAgo from '../common/TimeAgo';
 
 export default function EditVendorInfo(): React.ReactElement {
   const vendor = useOutletContext<Vendor>();
-  const [vendorInput, setVendorInput] = useState<VendorInput>(
-    pick(vendor, ['name', 'description', 'website_url', 'instagram_url', 'facebook_url'])
+  const [vendorInput, setVendorInput] = useState<VendorInput>(  
+    pick(vendor, ['name', 'description', 'website_url', 'instagram_url', 'facebook_url', 'youtube_url'])
   );
   const [form, handleFormElementChange] = useForm<VendorInput>(vendorInput);
   const [lastSaved, setLastSaved] = useState<Date>(new Date(vendor.updated_at || vendor.created_at));
@@ -36,6 +36,7 @@ export default function EditVendorInfo(): React.ReactElement {
       <Grid container spacing={4}>
         <Grid item xs={12}>
           <TextField
+            autoFocus
             name="name"
             required
             label="Name"
@@ -98,6 +99,20 @@ export default function EditVendorInfo(): React.ReactElement {
             fullWidth
             placeholder='Ex: https://www.facebook.com/myfarm'
             helperText="Facebook profile address"
+          />
+        </Grid>
+
+        <Grid item xs={12}>
+          <TextField
+            name="youtube_url"
+            type="url"
+            label="Youtube"
+            value={form.youtube_url || ''}
+            onChange={handleFormElementChange}
+            variant="filled"
+            fullWidth
+            placeholder='Ex: https://www.youtube.com/myfarm'
+            helperText="Youtube profile address"
           />
         </Grid>
       </Grid>

@@ -1,34 +1,35 @@
 import DeleteIcon from '@mui/icons-material/Delete';
-
 import IconButton from '@mui/material/IconButton';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import config from '../config';
-import photoHelper from '../shared/photoHelper';
-import { Photo, PhotoId, PlaceId } from '../shared/types';
-import snackbarService from '../snackbar/snackbarService';
-import placesService from './placesService';
-import UploadPhoto from './UploadPhoto';
+import { useOutletContext } from 'react-router-dom';
+import config from '../../config';
+import { photoService } from '../../services';
+import { Photo, PhotoId, Vendor } from '../../shared';
+import photoHelper from '../../shared/photoHelper';
+import snackbarService from '../../snackbar/snackbarService';
+import UploadPhoto from '../common/UploadPhoto';
 
-export default function EditPlacePhotos(): React.ReactElement {  
-  const placeId = Number(useParams<keyof { placeId: PlaceId }>().placeId);
+export default function EditVendorPhotos(): React.ReactElement {  
+  const vendor = useOutletContext<Vendor>();
   const [photos, setPhotos] = useState<Photo[] | null>(null);
 
   const fetchPhotos = useCallback(async () => {
-    return placesService.getPhotos(placeId).then(photos => setPhotos(photos));
-  }, [placeId]);
+    const photos = await photoService.getEntityPhotos('vendor', vendor.id);
+    setPhotos(photos);
+  }, [vendor]);
   
 
   useEffect(() => {
     fetchPhotos();
-  }, [placeId, fetchPhotos]);
+  }, [fetchPhotos]);
 
-  async function addPhoto(file: File): Promise<void> {
+  async function uploadPhoto(file: File): Promise<void> {
     try {
-      await placesService.addPhoto(placeId, { file: file, contentType: file.type });
+      const photo = await photoService.uploadPhoto(file);
+      await photoService.addEntityPhotos('vendor', vendor.id, photo.id as PhotoId);
       snackbarService.showSnackbar('Photo added.', 'success');
       fetchPhotos();
     } catch (error) {
@@ -38,14 +39,18 @@ export default function EditPlacePhotos(): React.ReactElement {
   }
 
   async function handleDeletePhoto(photoId: PhotoId) {
-    await placesService.deletePhoto(placeId, photoId);
-    snackbarService.showSnackbar('Photo was deleted', 'info');
-    await fetchPhotos();
+    if (window.confirm('Sure you want to remove this photo?')) {
+      await photoService.deleteEntityPhoto('vendor', vendor.id, photoId);
+      snackbarService.showSnackbar('Photo was removed.', 'info');
+      await fetchPhotos();
+    }
   }
 
   return (
     <React.Fragment>
-      <UploadPhoto onUpload={addPhoto} disabled={placesService.isWorking} />
+      <hr />
+      <UploadPhoto onUpload={uploadPhoto} disabled={false/*placesService.isWorking*/} />
+      <hr />
       
       {photos && <ImageList variant='quilted' sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
         {photos.map(({ id, key, bucket, sizes }) => {

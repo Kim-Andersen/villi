@@ -12,7 +12,9 @@
     "postinstall": "npm ci --prefix server && npm ci --prefix web-apps/admin",
     "setup": "npm run setup --prefix server && npm run setup --prefix web-apps/admin",
     "build": "npm run build --prefix server && npm run build --prefix web-apps/admin",
-    "prepare-server-deploy": "node scripts/prepare-server-deploy.js"
+    "prepare-server-deploy": "node scripts/prepare-server-deploy.js",
+    "deploy": "nodechef deploy -i villi -l server/deploy --rebuild",
+    "predeploy": "npm run prepare-server-deploy"
   },
   "devDependencies": {
     "fs-extra": "10.1.0"

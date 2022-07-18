@@ -6,7 +6,8 @@ export const vendorInputSchema: z.ZodType<Omit<Vendor, 'id' | 'created_at' | 'up
   description: z.string().nullable().optional(),
   website_url: z.string().nullable().optional(),
   instagram_url: z.string().nullable().optional(),
-  facebook_url: z.string().nullable().optional()
+  facebook_url: z.string().nullable().optional(),
+  youtube_url: z.string().nullable().optional()
 }).strict();
 
 export type VendorInput = z.infer<typeof vendorInputSchema>;

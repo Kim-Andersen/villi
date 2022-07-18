@@ -11,11 +11,6 @@ export const errorHandler : any = async (ctx : Koa.Context, next: Koa.Next ) => 
   try {
     await next();
   } catch (error) {
-    console.log('error', JSON.stringify(error));
-    console.log('typeof error', typeof error);
-    console.log('error instanceof ZodError', error instanceof ZodError);
-    console.log('error instanceof Error', error instanceof Error);
-    
     if (error instanceof Kysely.NoResultError) {
       log('Kysely.NoResultError', error);
 

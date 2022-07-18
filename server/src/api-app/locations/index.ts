@@ -2,7 +2,7 @@ import debug from 'debug';
 import httpStatus from 'http-status';
 import Koa from 'koa';
 import Router from 'koa-router';
-import { pick } from 'Lodash';
+import { pick } from 'lodash';
 import { locationService } from '../../services';
 import { LocationId, locationInputSchema, LocationSearch, locationSearchSchema, parseId } from '../../shared';
 

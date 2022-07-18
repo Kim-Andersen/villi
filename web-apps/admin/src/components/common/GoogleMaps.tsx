@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import parse from 'autosuggest-highlight/parse';
 import throttle from 'lodash/throttle';
 import * as React from 'react';
-import config from '../config';
+import config from '../../config';
 
 // This key was created specifically for the demo in mui.com.
 // You need to create a new one for your application.

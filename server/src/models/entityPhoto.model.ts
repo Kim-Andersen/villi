@@ -1,6 +1,6 @@
 import { debug } from 'debug';
 import type { Database } from '../database';
-import { EntityPhoto, EntityPhotoInput, EntityType, Photo } from '../shared';
+import { EntityPhoto, EntityPhotoInput, EntityType, Photo, PhotoId } from '../shared';
 import { ModelBase } from './ModelBase';
 import { IEntityPhotoModel } from './types';
 
@@ -11,11 +11,22 @@ export default class EntityPhotoModel extends ModelBase implements IEntityPhotoM
     super();
   }
 
-  findAllEntityPhotos(entity_id: number, entity_type: EntityType): Promise<Photo[]> {
+  public async countPhotoEntities(photo_id: PhotoId): Promise<number> {
+    const { count } = await this.db
+      .selectFrom('entity_photo')
+      .select(this.db.fn.count<number>('id').as('count'))
+      .where('photo_id', '=', photo_id)
+      .executeTakeFirstOrThrow();
+
+    this.log('countPhotoEntities', { photo_id, count });
+    return Number(count); // TODO: For some reason "count" is returned as a string.
+  }
+
+  public async findAllEntityPhotos(entity_id: number, entity_type: EntityType): Promise<Photo[]> {
     return this.db
       .selectFrom('photo')
       .innerJoin('entity_photo', 'entity_photo.photo_id', 'photo.id')
-      .selectAll('photo')
+      .selectAll(['photo'])
       .where('entity_photo.entity_id', '=', entity_id)
       .where('entity_photo.entity_type', '=', entity_type)
       .execute();
@@ -27,6 +38,10 @@ export default class EntityPhotoModel extends ModelBase implements IEntityPhotoM
     return this.db
       .insertInto('entity_photo')
       .values(input)
+      .onConflict((oc) => oc
+        .columns(['entity_id', 'entity_type', 'photo_id'])
+        .doUpdateSet(input)
+      )
       .returningAll()
       .executeTakeFirstOrThrow();
   }

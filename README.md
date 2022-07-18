@@ -41,7 +41,7 @@ Each seed is defiend in a `.sql` file in the `server/seeds` directory and must b
 - `GEOCODER_API_KEY`: used with the `node-geocoder` module.
 
 Nodechef Object Storage credentials:
-- `NC_OBJECT_STORAGE_KEY`
+- `NC_OBJECT_STORAGE_ACCESS_KEY`
 - `NC_OBJECT_STORAGE_SECRET_KEY`
 - `NC_OBJECT_STORAGE_ENDPOINT`
 

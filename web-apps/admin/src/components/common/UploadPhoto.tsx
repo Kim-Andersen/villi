@@ -1,6 +1,6 @@
 import LoadingButton from '@mui/lab/LoadingButton';
 import React, { useState } from 'react';
-import { resizeImageFile } from '../utils/resizeImageFile';
+import { resizeImageFile } from '../../utils/resizeImageFile';
 
 async function base64ToFile(base64: string, name: string, type: string): Promise<File> {
   const res: Response = await fetch(base64);

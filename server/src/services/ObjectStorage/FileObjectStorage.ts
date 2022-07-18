@@ -1,7 +1,7 @@
 import debug from 'debug';
 import { createWriteStream, mkdir, pathExists, unlink } from 'fs-extra';
 import { join, normalize } from 'path';
-import config from '../config';
+import config from '../../config';
 import { IObjectStorage } from './types';
 
 export class FileObjectStorage implements IObjectStorage {

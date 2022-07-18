@@ -3,8 +3,8 @@ import AlertTitle from '@mui/material/AlertTitle';
 import Box from '@mui/material/Box';
 import React, { useState } from 'react';
 import { ZodError } from 'zod';
-import getStaticMapUrl from '../../places/getStaticMapUrl';
 import { LocationInput, locationInputSchema } from '../../shared';
+import getStaticMapUrl from '../../utils/getStaticMapUrl';
 import LocationIQAutocomplete, { LocationIQ } from '../common/LocationIQAutocomplete';
 
 type Props = {

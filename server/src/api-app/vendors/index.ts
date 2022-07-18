@@ -2,8 +2,8 @@ import debug from 'debug';
 import httpStatus from 'http-status';
 import Koa from 'koa';
 import Router from 'koa-router';
-import { photoService, vendorService } from '../../services';
-import { entityPhotoInputSchema, parseId, PhotoId, VendorId, vendorInputSchema, VendorLocationId, vendorLocationInputSchema } from '../../shared';
+import { vendorService } from '../../services';
+import { parseId, VendorId, vendorInputSchema, VendorLocationId, vendorLocationInputSchema } from '../../shared';
 
 const log = debug('/vendors');
 
@@ -34,7 +34,7 @@ router.get('/:vendorId', async (ctx: Koa.Context) => {
 
 router.put('/:vendorId', async (ctx: Koa.Context) => {
   const vendorId = parseId<VendorId>(ctx.params.vendorId);
-  const input = await vendorInputSchema.parseAsync(ctx.body);
+  const input = await vendorInputSchema.parseAsync(ctx.request.body);
   log('update vendor', { vendorId, input });
 
   ctx.body = await vendorService.updateVendor(vendorId, input);
@@ -81,32 +81,6 @@ router.delete('/:vendorId/locations/:id', async (ctx: Koa.Context) => {
 
   await vendorService.removeVendorLocation(id);
   ctx.body = {};
-  ctx.status = httpStatus.OK;
-});
-
-router.get('/:vendorId/photos', async (ctx: Koa.Context) => {
-  const vendor_id = parseId<VendorId>(ctx.params.vendorId);
-  log('get vendor photos', { vendor_id });
-
-  ctx.body = await photoService.findAllEntityPhotos(vendor_id, 'vendor');
-  ctx.status = httpStatus.OK;
-});
-
-router.post('/:vendorId/photos', async (ctx: Koa.Context) => {
-  const input = entityPhotoInputSchema.parse(ctx.request.body);
-  log('add photo to vendor', { input });
-
-  ctx.body = await photoService.addPhotoToEntity(input);
-  ctx.status = httpStatus.CREATED;
-});
-
-router.delete('/:vendorId/photos/:photoId', async (ctx: Koa.Context) => {
-  const entity_id = parseId<VendorId>(ctx.params.vendorId);
-  const photo_id = parseId<PhotoId>(ctx.params.photoId);
-  const input = entityPhotoInputSchema.parse({ entity_id, photo_id, entity_type: 'vendor' });
-
-  await photoService.removePhotoFromEntity(input);
-  ctx.body = {}
   ctx.status = httpStatus.OK;
 });
 

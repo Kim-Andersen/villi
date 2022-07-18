@@ -10,7 +10,7 @@ export default {
   },
   nodechef: {
     objectStorage: {
-      accessKey: getEnvVar('NC_OBJECT_STORAGE_KEY'),
+      accessKey: getEnvVar('NC_OBJECT_STORAGE_ACCESS_KEY'),
       secretAccessKey: getEnvVar('NC_OBJECT_STORAGE_SECRET_KEY'),
       endpoint: getEnvVar('NC_OBJECT_STORAGE_ENDPOINT')
     }

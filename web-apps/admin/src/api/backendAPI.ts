@@ -1,6 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { APIResponse } from '../shared/types';
+import errorHandlerService from '../snackbar/errorHandlerService';
 import { APIRequestError } from './APIRequestError';
 import { HttpMethod, IBackendAPI } from './types';
 
@@ -51,18 +52,21 @@ class BackendAPI implements IBackendAPI {
 
     console.log(method, url, requestInit);
 
+    let response: Response;
     try {
-      const response = await fetch(url, requestInit);
+      response = await fetch(url, requestInit);
       if (response.ok) {
         return await response.json();
       }
+
       throw response;
     } catch(error) {
       if (error instanceof Response) {
-        throw new APIRequestError(error);
-      } else {
-        throw error;
+        errorHandlerService.handleError(new APIRequestError(error.clone()));
+      } else if (error instanceof Error) {
+        errorHandlerService.handleError(error);
       }
+      throw error;
     } finally {
       this.workingState.next(false);
     }

@@ -1,7 +1,7 @@
 import Button from '@mui/material/Button';
 import React, { useState } from 'react';
-import getStaticMapUrl from '../../places/getStaticMapUrl';
 import { LocationInput } from '../../shared';
+import getStaticMapUrl from '../../utils/getStaticMapUrl';
 import LocationIQAutocomplete, { LocationIQ } from '../common/LocationIQAutocomplete';
 
 type Props = {

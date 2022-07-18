@@ -7,8 +7,10 @@ import React from 'react';
 import { Link, Route, Routes } from "react-router-dom";
 import { backendAPI } from './api/backendAPI';
 import './App.css';
+import ErrorDialog from './components/common/ErrorDialog';
 import EditVendorInfo from './components/vendor/EditVendorInfo';
 import EditVendorLocations from './components/vendor/EditVendorLocations';
+import EditVendorPhotos from './components/vendor/EditVendorPhotos';
 import EditVendorTags from './components/vendor/EditVendorTags';
 import Home from './home/Home';
 import ScrollToTop from './ScrollToTop';
@@ -46,13 +48,15 @@ function App(): React.ReactElement {
               <Route path="vendors/:vendorId" element={<VendorDetails />}>
                 <Route path="" element={<EditVendorInfo />}></Route>
                 <Route path="locations" element={<EditVendorLocations />}></Route>
-                {/* <Route path="photos" element={<EditPlacePhotos />}></Route> */}
+                <Route path="photos" element={<EditVendorPhotos />}></Route>
                 <Route path="tags" element={<EditVendorTags />}></Route>
               </Route>
               <Route path="/" element={<Home />}></Route>
             </Routes>
           </main>
         </Container>
+
+        <ErrorDialog></ErrorDialog>
 
         <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }} disableWindowBlurListener key={snackbar ? snackbar.message : 'foo'} open={snackbar !== null} autoHideDuration={5000} onClose={handleSnackbarClose}>
           <Alert onClose={handleSnackbarClose} severity={snackbar ? snackbar.severity : 'info'} sx={{ width: '100%' }}>

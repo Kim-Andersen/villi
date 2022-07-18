@@ -12,9 +12,9 @@ import Stepper from '@mui/material/Stepper';
 import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
 import useForm from '../../../hooks/useForm';
-import Map from '../../../places/Map';
 import { LocationInput, LocationType } from '../../../shared';
 import LocationIQAutocomplete, { LocationIQ } from '../../common/LocationIQAutocomplete';
+import Map from '../../common/Map';
 
 export type Result = {
   locationInput: LocationInput;
