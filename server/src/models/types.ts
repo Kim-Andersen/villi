@@ -1,4 +1,4 @@
-import { EntityPhoto, EntityPhotoInput, EntityType, Location, LocationId, LocationInput, LocationSearch, Photo, PhotoId, PhotoInput, PhotoSearch, Tagged, TaggedSearch, Vendor, VendorId, VendorInput, VendorLocation, VendorLocationDetails, VendorLocationId, VendorLocationInput, VendorLocationSearch, VendorSearch } from '../shared';
+import { EntityPhoto, EntityPhotoInput, EntityPhotoSearch, Location, LocationId, LocationInput, LocationSearch, Photo, PhotoId, PhotoInput, PhotoSearch, Tagged, TaggedSearch, Vendor, VendorId, VendorInput, VendorLocation, VendorLocationDetails, VendorLocationId, VendorLocationInput, VendorLocationSearch, VendorSearch } from '../shared';
 
 export interface IVendorModel {
   findById(id: VendorId): Promise<Vendor>;
@@ -43,7 +43,7 @@ export interface IPhotoModel {
 }
 
 export interface IEntityPhotoModel {
-  findAllEntityPhotos(entity_id: number, entity_type: EntityType): Promise<Photo[]>;
+  findAll(search: EntityPhotoSearch): Promise<Photo[]>;
   insert(input: EntityPhotoInput): Promise<EntityPhoto>;
   delete(input: EntityPhotoInput): Promise<void>;
   countPhotoEntities(photo_id: PhotoId): Promise<number>;

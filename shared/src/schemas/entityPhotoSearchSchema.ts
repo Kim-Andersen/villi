@@ -1,12 +1,20 @@
 import { z } from "zod";
 import { EntityPhoto } from '../generated/db';
-import { entityType } from './entityType';
 
-export const entityPhotoSearchSchema: z.ZodType<Partial<Pick<EntityPhoto, 'id' | 'photo_id' | 'entity_id' | 'entity_type'>>> = z.object({
-  id: z.number().int(),
-  photo_id: z.number().int(),
-  entity_id: z.number().int(),
-  entity_type: entityType
-}).strict();
+export const entityPhotoSearchSchema: z.ZodType<Partial<Omit<EntityPhoto, 'id'>>> = z.object({
+  photo_id: z.number().int().optional(),
+  vendor_id: z.number().int().optional(),
+  location_id: z.number().int().optional(),
+  vendor_location_id: z.number().int().optional()
+})
+  .strict()
+  .refine(data => 
+    Number.isInteger(data.photo_id) === false || 
+    Number.isInteger(data.vendor_id) === false || 
+    Number.isInteger(data.location_id) === false || 
+    Number.isInteger(data.vendor_location_id) === false, {
+      message: 'One of vendor_id, location_id or vendor_location_id must be defined.'
+    }
+  );
 
 export type EntityPhotoSearch = z.infer<typeof entityPhotoSearchSchema>;

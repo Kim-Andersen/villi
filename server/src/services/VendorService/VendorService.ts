@@ -70,11 +70,6 @@ export class VendorService {
   public async deleteVendor(vendorId: VendorId): Promise<void> {
     this.log('deleteVendor', { vendorId });
 
-    // TODO: This is a big procedure which should be queued to a background task.
-
-    // Delete all vendor photos.
-    await this.photoService.removeAllEntityPhotos('vendor', vendorId);
-
     return this.vendorModel.deleteVendor(vendorId);
   }
 }
