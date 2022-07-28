@@ -1,0 +1,44 @@
+version: 2.0
+
+orbs:
+  node: circleci/node@5.0.2
+
+jobs:
+  build:
+    executor: node/default # use the default executor defined within the orb
+    docker:
+      - image: cimg/postgres:12.0
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: circle_test
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres@localhost/circle_test
+      POSTGRES_USER: postgres
+      POSTGRES_DB: circle_test
+    steps:
+      - checkout
+      - run: sudo apt-get update
+      - run: sudo apt-get install postgresql-client
+      - run: whoami
+      - run: |
+          psql \
+          -d $TEST_DATABASE_URL \
+          -c "CREATE TABLE test (name char(25));"
+      - run: |
+          psql \
+          -d $TEST_DATABASE_URL \
+          -c "INSERT INTO test VALUES ('John'), ('Joanna'), ('Jennifer');"
+      #- run: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - node/install-packages:
+          pkg-manager: npm
+      - run: npm install -g nodechef-cli
+      - run: npm run setup
+      - run: npm run build
+      - run: npm run prepare-server-deploy
+      - run: nodechef deploy -i villi -auth ${NC_DEPLOY_TOKEN} -l server/deploy --rebuild
+
+workflow:
+  build_and_deploy:
+    jobs:
+      - build
