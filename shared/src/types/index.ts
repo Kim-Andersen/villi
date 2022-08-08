@@ -6,6 +6,7 @@ export type VendorId = number & { __flavor: 'VendorId' };
 export type LocationId = number & { __flavor: 'LocationId' };
 export type VendorLocationId = number & { __flavor: 'VendorLocationId' };
 export type PhotoId = number & { __flavor: 'PhotoId' };
+export type ProductId = number & { __flavor: 'ProductId' };
 
 /**
  * Two-item array containing latitude and longitude.

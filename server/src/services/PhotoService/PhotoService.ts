@@ -2,14 +2,16 @@ import debug from 'debug';
 import { unlink } from 'fs-extra';
 import sharp from 'sharp';
 import { IEntityPhotoModel, IPhotoModel } from '../../models';
-import { EntityPhoto, EntityPhotoInput, LocationId, Photo, PhotoId, photoInputSchema, PhotoSize, VendorId, VendorLocationId } from '../../shared';
+import { EntityPhoto, EntityPhotoInput, LocationId, Photo, PhotoId, photoInputSchema, PhotoSizes, ProductId, VendorId, VendorLocationId } from '../../shared';
 import photoHelper from '../../shared/photoHelper';
 import { IObjectStorage } from '../ObjectStorage/types';
 import { IPhotoService } from './types';
 
+type EntityType = 'vendor_id' | 'location_id' | 'vendor_location_id' | 'product_id';
+type EntityId = VendorId | LocationId | VendorLocationId | ProductId;
+
 export default class PhotoService implements IPhotoService {
   private readonly bucket = 'villi-photos';
-  private readonly sizes: PhotoSize[] = ['sm', 'md'];
   private readonly log = debug(PhotoService.name);
   
   constructor(
@@ -22,19 +24,8 @@ export default class PhotoService implements IPhotoService {
     this.objectStorage.ensureBucket(this.bucket);
   }
 
-  public findAllVendorPhotos(vendor_id: VendorId): Promise<Photo[]> {
-    this.log('findAllVendorPhotos', { vendor_id });
-    return this.entityPhotoModel.findAll({ vendor_id });
-  }
-
-  public findAllLocationPhotos(location_id: LocationId): Promise<Photo[]> {
-    this.log('findAllLocationPhotos', { location_id });
-    return this.entityPhotoModel.findAll({ location_id });
-  }
-
-  public findAllVendorLocationPhotos(vendor_location_id: VendorLocationId): Promise<Photo[]> {
-    this.log('findAllVendorLocationPhotos', { vendor_location_id });
-    return this.entityPhotoModel.findAll({ vendor_location_id });
+  public async findAllEntityPhotos(entityType: EntityType, entityId: EntityId): Promise<Photo[]> {
+    return this.entityPhotoModel.findAll({ [entityType]: entityId });
   }
   
   /**
@@ -43,7 +34,6 @@ export default class PhotoService implements IPhotoService {
   public async addPhotoToEntity(input: EntityPhotoInput): Promise<EntityPhoto> {
     this.log('addPhotoToEntity', { input });
     return this.entityPhotoModel.insert(input);
-  
   }
 
   /**
@@ -55,16 +45,19 @@ export default class PhotoService implements IPhotoService {
     await this.entityPhotoModel.delete(input);
 
     // Delete photo if it has no remaining entities referencing it.
-    if (await (this.entityPhotoModel.countPhotoEntities(input.photo_id as PhotoId)) === 0) {
+    const refCount = await this.entityPhotoModel.countPhotoEntities(input.photo_id as PhotoId);
+    this.log({ refCount });
+
+    if (refCount === 0) {
       this.log('Deleting photo as no entities are referencing it.', { photo_id: input.photo_id })
       await this.deletePhoto(input.photo_id as PhotoId);
     }
   }
 
-  public async addPhoto(filePath: string, { content_type }: { content_type: string }): Promise<Photo> {
+  public async addPhoto(filePath: string, { content_type, sizes }: { content_type: string, sizes: PhotoSizes }): Promise<Photo> {
     const log = this.log.extend('addPhoto');
 
-    const { bucket, sizes } = this;
+    const bucket = this.bucket;
     log('addPhoto', { filePath, sizes, bucket, content_type });
 
     /**

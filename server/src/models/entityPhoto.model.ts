@@ -62,13 +62,16 @@ export default class EntityPhotoModel extends ModelBase implements IEntityPhotoM
     this.log('delete', { input });
 
     let query = this.db
-      .deleteFrom('entity_photo');
+      .deleteFrom('entity_photo')
+      .where('photo_id', '=', input.photo_id)
 
     if (input.vendor_id) {
       query = query.where('vendor_id', '=', input.vendor_id)
     } else if (input.location_id) {
       query = query.where('location_id', '=', input.location_id)
-    } else if (input.vendor_location_id) {
+    } else if (input.product_id) {
+      query = query.where('product_id', '=', input.product_id)
+    }else if (input.vendor_location_id) {
       query = query.where('vendor_location_id', '=', input.vendor_location_id)
     }
          

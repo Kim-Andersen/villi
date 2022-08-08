@@ -2,7 +2,7 @@ import debug from 'debug';
 import httpStatus from 'http-status';
 import Koa from 'koa';
 import Router from 'koa-router';
-import { photoService, vendorService } from '../../services';
+import { photoService, productService, vendorService } from '../../services';
 import { entityPhotoInputSchema, parseId, PhotoId, VendorId, vendorInputSchema, VendorLocationId, vendorLocationInputSchema } from '../../shared';
 
 const log = debug('/vendors');
@@ -88,7 +88,7 @@ router.get('/:vendorId/photos', async (ctx: Koa.Context) => {
   const vendor_id = parseId<VendorId>(ctx.params.vendorId);
   log('get vendor photos', { vendor_id });
 
-  ctx.body = await photoService.findAllVendorPhotos(vendor_id);
+  ctx.body = await photoService.findAllEntityPhotos('vendor_id', vendor_id);
   ctx.status = httpStatus.OK;
 });
 
@@ -110,6 +110,14 @@ router.delete('/:vendorId/photos/:photoId', async (ctx: Koa.Context) => {
 
   await photoService.removePhotoFromEntity(input);
   ctx.body = {};
+  ctx.status = httpStatus.OK;
+});
+
+router.get('/:vendorId/products', async (ctx: Koa.Context) => {
+  const vendor_id = parseId<VendorId>(ctx.params.vendorId);
+  log('get vendor products', { vendor_id });
+
+  ctx.body = await productService.findAllByVendor(vendor_id);
   ctx.status = httpStatus.OK;
 });
 

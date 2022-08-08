@@ -10,7 +10,7 @@
     "seed": "npm run tsnode -- seeds/seeder.ts",
     "tsnode": "NODE_OPTIONS='--abort-on-uncaught-exception' ts-node -r dotenv/config",
     "test": "jest",
-    "schemats": "schemats postgres postgres://postgres@localhost/villi-dev -C -o \"../shared/src/generated/db.ts\" -f \"../types\" --no-throw-on-missing-type --tables vendor location vendor_location tagged photo entity_photo"
+    "schemats": "schemats postgres postgres://postgres@localhost/villi-dev -C -o \"../shared/src/generated/db.ts\" -f \"../types\" --no-throw-on-missing-type --tables vendor location vendor_location tagged photo entity_photo product"
   },
   "devDependencies": {
     "@kristiandupont/recase": "1.1.2",

@@ -1,4 +1,4 @@
-import { EntityPhoto, EntityPhotoInput, EntityPhotoSearch, Location, LocationId, LocationInput, LocationSearch, Photo, PhotoId, PhotoInput, PhotoSearch, Tagged, TaggedSearch, Vendor, VendorId, VendorInput, VendorLocation, VendorLocationDetails, VendorLocationId, VendorLocationInput, VendorLocationSearch, VendorSearch } from '../shared';
+import { EntityPhoto, EntityPhotoInput, EntityPhotoSearch, Location, LocationId, LocationInput, LocationSearch, Photo, PhotoId, PhotoInput, PhotoSearch, Product, ProductId, ProductInput, Tagged, TaggedSearch, Vendor, VendorId, VendorInput, VendorLocation, VendorLocationDetails, VendorLocationId, VendorLocationInput, VendorLocationSearch, VendorSearch } from '../shared';
 
 export interface IVendorModel {
   findById(id: VendorId): Promise<Vendor>;
@@ -47,4 +47,12 @@ export interface IEntityPhotoModel {
   insert(input: EntityPhotoInput): Promise<EntityPhoto>;
   delete(input: EntityPhotoInput): Promise<void>;
   countPhotoEntities(photo_id: PhotoId): Promise<number>;
+}
+
+export interface IProductModel {
+  findById(id: ProductId): Promise<Product>;
+  findAllByVendor(vendorId: VendorId): Promise<Product[]>;
+  insert(input: ProductInput): Promise<Product>;
+  update(id: ProductId, input: ProductInput): Promise<Pick<Product, 'updated_at'>>;
+  delete(productId: ProductId): Promise<void>;
 }

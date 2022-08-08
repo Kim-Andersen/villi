@@ -12,9 +12,10 @@ async function base64ToFile(base64: string, name: string, type: string): Promise
 type Props = {
   onUpload: (file: File) => void;
   disabled?: boolean;
+  maxSize: number;
 };
 
-export default function UploadPhoto({ onUpload, disabled }: Props): React.ReactElement {
+export default function UploadPhoto({ onUpload, disabled, maxSize }: Props): React.ReactElement {
   // const [sourceFile, setSourceFile] = useState<File | null>(null);
   const [workingImageBase64, setWorkingImageBase64] = useState<string | null>(null);
 
@@ -35,7 +36,7 @@ export default function UploadPhoto({ onUpload, disabled }: Props): React.ReactE
 
     // setSourceFile(file);
     try {
-      const base64 = await resizeImageFile(file, { compressFormat: 'JPEG', maxWidth: 800, maxHeight: 800, rotation: 0, quality: 100 });
+      const base64 = await resizeImageFile(file, { compressFormat: 'JPEG', maxWidth: maxSize, maxHeight: maxSize, rotation: 0, quality: 100 });
       const fileResult = await base64ToFile(base64, file.name, file.type);
       setWorkingImageBase64(base64);
       onUpload(fileResult);

@@ -38,7 +38,7 @@ router.post('/', async (ctx: Koa.Context) => {
 router.put('/:locationId', async (ctx: Koa.Context) => {
   const locationId = parseId<LocationId>(ctx.params.locationId);
   const input = await locationInputSchema.parseAsync(ctx.request.body);
-  log('update location', { input });
+  log('update location', { locationId, input });
   ctx.body = await locationService.updateLocation(locationId, input);
   ctx.status = httpStatus.CREATED;
 });
@@ -68,7 +68,7 @@ router.get('/:locationId/photos', async (ctx: Koa.Context) => {
   const locationId = parseId<LocationId>(ctx.params.locationId);
   log('get location photos', { locationId });
 
-  ctx.body = await photoService.findAllLocationPhotos(locationId);
+  ctx.body = await photoService.findAllEntityPhotos('location_id', locationId);
   ctx.status = httpStatus.OK;
 });
 

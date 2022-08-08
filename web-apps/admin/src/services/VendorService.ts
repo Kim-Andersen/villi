@@ -1,6 +1,6 @@
 import { pick } from 'lodash';
 import { IBackendAPI } from '../api/types';
-import { EntityPhoto, Photo, PhotoId, Vendor, VendorId, VendorInput, VendorLocationDetails, VendorLocationId, VendorLocationInput, vendorLocationInputSchema } from '../shared';
+import { Vendor, VendorId, VendorInput, VendorLocationDetails, VendorLocationId, VendorLocationInput, vendorLocationInputSchema } from '../shared';
 import snackbarService from '../snackbar/snackbarService';
 
 export default class VendorService {
@@ -51,17 +51,5 @@ export default class VendorService {
     const result = await this.api.put<Pick<Vendor, 'updated_at'>>(`/vendors/${vendorId}`, update);
     snackbarService.showSnackbar('Vendor was updated.', 'success');
     return result;
-  }
-
-  public async getPhotos(vendorId: VendorId): Promise<Photo[]> {
-    return this.api.get<Photo[]>(`/vendors/${vendorId}/photos`);
-  }
-
-  public async addPhoto(vendorId: number, photoId: PhotoId): Promise<EntityPhoto> {
-    return this.api.post<EntityPhoto>(`/vendors/${vendorId}/photos/${photoId}`, {});
-  }
-
-  public async deletePhoto(vendorId: number, photoId: PhotoId): Promise<void> {
-    return this.api.delete(`/vendors/${vendorId}/photos/${photoId}`);
   }
 }

@@ -1,9 +1,9 @@
-import { EntityPhoto, EntityPhotoInput, LocationId, Photo, PhotoId, VendorId, VendorLocationId } from '../../shared';
+import { EntityPhoto, EntityPhotoInput, LocationId, Photo, PhotoId, ProductId, VendorId, VendorLocationId } from '../../shared';
 
+export type EntityType = 'vendor_id' | 'location_id' | 'vendor_location_id' | 'product_id';
+export type EntityId = VendorId | LocationId | VendorLocationId | ProductId;
 export interface IPhotoService {
-  findAllVendorPhotos(vendor_id: VendorId): Promise<Photo[]>;
-  findAllLocationPhotos(location_id: LocationId): Promise<Photo[]>;
-  findAllVendorLocationPhotos(vendor_location_id: VendorLocationId): Promise<Photo[]>;
+  findAllEntityPhotos(entityType: EntityType, entityId: EntityId): Promise<Photo[]>;
   addPhotoToEntity(input: EntityPhotoInput): Promise<EntityPhoto>;
   removePhotoFromEntity(input: EntityPhotoInput): Promise<void>;
   addPhoto(filePath: string, { content_type }: { content_type: string }): Promise<Photo>;

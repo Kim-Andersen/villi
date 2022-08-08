@@ -4,6 +4,7 @@ import Router from 'koa-router';
 import { errorHandler } from './errorHandler';
 import locationsAPI from './locations';
 import photos from './photos';
+import products from './products';
 import tagged from './tagged';
 import vendors from './vendors';
 
@@ -16,6 +17,7 @@ app.use(errorHandler);
 app.use(vendors.routes());
 app.use(tagged.routes());
 app.use(photos.routes());
+app.use(products.routes());
 app.use(locationsAPI.routes());
 
 router.get('/', async (ctx: Koa.Context, next: Koa.Next) => {
