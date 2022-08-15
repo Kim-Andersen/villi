@@ -16,17 +16,7 @@ type Props = {
 };
 
 export default function UploadPhoto({ onUpload, disabled, maxSize }: Props): React.ReactElement {
-  // const [sourceFile, setSourceFile] = useState<File | null>(null);
   const [workingImageBase64, setWorkingImageBase64] = useState<string | null>(null);
-
-  // async function handleUploadClick() {
-  //   if (workingImageBase64 === null || sourceFile === null) {
-  //     return;
-  //   }
-  //   const file = await base64ToFile(workingImageBase64, sourceFile.name, sourceFile.type);
-  //   onUpload(file);
-  //   setWorkingImageBase64(null);
-  // }
 
   async function fileChangedHandler(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files && event.target.files.length === 1 ? event.target.files[0] : null;
@@ -34,7 +24,6 @@ export default function UploadPhoto({ onUpload, disabled, maxSize }: Props): Rea
       return;
     }
 
-    // setSourceFile(file);
     try {
       const base64 = await resizeImageFile(file, { compressFormat: 'JPEG', maxWidth: maxSize, maxHeight: maxSize, rotation: 0, quality: 100 });
       const fileResult = await base64ToFile(base64, file.name, file.type);
@@ -52,8 +41,9 @@ export default function UploadPhoto({ onUpload, disabled, maxSize }: Props): Rea
         variant="outlined"
         startIcon={<UploadFileIcon />}
         sx={{ marginRight: "1rem" }}
+        disabled={disabled}
       >
-        Upload photo
+        Upload
         <input type="file" accept="image/*" hidden onChange={fileChangedHandler} />
       </Button>
       

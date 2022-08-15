@@ -1,6 +1,6 @@
 import { pick } from 'lodash';
 import { IBackendAPI } from '../api/types';
-import { Vendor, VendorId, VendorInput, VendorLocationDetails, VendorLocationId, VendorLocationInput, vendorLocationInputSchema } from '../shared';
+import { Product, Vendor, VendorId, VendorInput, VendorLocationDetails, VendorLocationId, VendorLocationInput, vendorLocationInputSchema } from '../shared';
 import snackbarService from '../snackbar/snackbarService';
 
 export default class VendorService {
@@ -37,6 +37,10 @@ export default class VendorService {
 
   public async getVendorLocations(vendorId: VendorId): Promise<VendorLocationDetails[]> {
     return this.api.get<VendorLocationDetails[]>(`/vendors/${vendorId}/locations`);
+  }
+
+  public async getProducts(vendorId: VendorId): Promise<Product[]> {
+    return this.api.get<Product[]>(`/vendors/${vendorId}/products`);
   }
 
   public async getVendorList(): Promise<Vendor[]> {

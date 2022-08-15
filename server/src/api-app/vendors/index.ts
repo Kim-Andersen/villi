@@ -2,8 +2,8 @@ import debug from 'debug';
 import httpStatus from 'http-status';
 import Koa from 'koa';
 import Router from 'koa-router';
-import { photoService, productService, vendorService } from '../../services';
-import { entityPhotoInputSchema, parseId, PhotoId, VendorId, vendorInputSchema, VendorLocationId, vendorLocationInputSchema } from '../../shared';
+import { productService, vendorService } from '../../services';
+import { parseId, VendorId, vendorInputSchema, VendorLocationId, vendorLocationInputSchema } from '../../shared';
 
 const log = debug('/vendors');
 
@@ -84,40 +84,11 @@ router.delete('/:vendorId/locations/:id', async (ctx: Koa.Context) => {
   ctx.status = httpStatus.OK;
 });
 
-router.get('/:vendorId/photos', async (ctx: Koa.Context) => {
-  const vendor_id = parseId<VendorId>(ctx.params.vendorId);
-  log('get vendor photos', { vendor_id });
-
-  ctx.body = await photoService.findAllEntityPhotos('vendor_id', vendor_id);
-  ctx.status = httpStatus.OK;
-});
-
-router.post('/:vendorId/photos/:photoId', async (ctx: Koa.Context) => {
-  const vendor_id = parseId<VendorId>(ctx.params.vendorId);
-  const photo_id = parseId<PhotoId>(ctx.params.photoId);
-  const input = entityPhotoInputSchema.parse({ vendor_id, photo_id });
-  log('add vendor photo', { input });
-
-  ctx.body = await photoService.addPhotoToEntity(input);
-  ctx.status = httpStatus.OK;
-});
-
-router.delete('/:vendorId/photos/:photoId', async (ctx: Koa.Context) => {
-  const vendor_id = parseId<VendorId>(ctx.params.vendorId);
-  const photo_id = parseId<PhotoId>(ctx.params.photoId);
-  const input = entityPhotoInputSchema.parse({ vendor_id, photo_id });
-  log('remove vendor photo', { vendor_id });
-
-  await photoService.removePhotoFromEntity(input);
-  ctx.body = {};
-  ctx.status = httpStatus.OK;
-});
-
 router.get('/:vendorId/products', async (ctx: Koa.Context) => {
   const vendor_id = parseId<VendorId>(ctx.params.vendorId);
   log('get vendor products', { vendor_id });
 
-  ctx.body = await productService.findAllByVendor(vendor_id);
+  ctx.body = await productService.findAllProductsByVendor(vendor_id);
   ctx.status = httpStatus.OK;
 });
 

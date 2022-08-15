@@ -2,15 +2,13 @@ import debug from 'debug';
 import { BadRequestError } from '../../errors';
 import { IVendorLocationModel, IVendorModel } from '../../models';
 import { Vendor, VendorId, VendorInput, VendorLocation, VendorLocationDetails, VendorLocationId, VendorLocationInput, VendorLocationSearch } from '../../shared';
-import { IPhotoService } from '../PhotoService/types';
 
 export class VendorService {
   private readonly log = debug(VendorService.name);
   
   constructor(
     private readonly vendorModel: IVendorModel,
-    private readonly vendorLocationModel: IVendorLocationModel,
-    private readonly photoService: IPhotoService
+    private readonly vendorLocationModel: IVendorLocationModel
     ) {
     this.log('initialize');
   }

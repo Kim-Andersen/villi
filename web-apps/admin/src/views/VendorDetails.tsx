@@ -15,7 +15,7 @@ export default function VendorDetails(): React.ReactElement {
   const location = useLocation();
   const navigate = useNavigate();
   const [vendor, setVendor] = useState<Vendor | null>(null);
-  const tabs = ['', 'locations', 'photos', 'tags'];
+  const tabs = ['', 'locations', 'photos', 'tags', 'products'];
   const tab = location.pathname.substring(location.pathname.lastIndexOf('/') + 1);
   const tabIndex = tabs.includes(tab) ? tabs.indexOf(tab) : 0;
 
@@ -47,9 +47,10 @@ export default function VendorDetails(): React.ReactElement {
             <Tab component={Link} label="Locations" to="locations"></Tab>
             <Tab component={Link} label="Photos" to="photos"></Tab>
             <Tab component={Link} label="Tags" to="tags"></Tab>
+            <Tab component={Link} label="Products" to="products"></Tab>
           </Tabs>
           <Box>
-            <Outlet context={vendor} />            
+            <Outlet context={vendor} />
           </Box>
         </Box>
       </React.Fragment>

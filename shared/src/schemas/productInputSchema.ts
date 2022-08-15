@@ -6,13 +6,12 @@ export const productInputSchema: z.ZodType<Omit<Product, 'id' | 'created_at' | '
   title: z.string(),
   description: z.string(),
   vendor_id: z.number().int(),
-  offer_id: z.string().min(1),  
+  offer_id: z.string(),  
   channel: productChannel,
   price: z.number().positive(),
-  sale_price: z.number().positive().optional(),
+  sale_price: z.optional(z.number().nullable()),
   currency: z.number().int(),
   highlights: z.array(z.string())
-  
 }).strict();
 
 export type ProductInput = z.infer<typeof productInputSchema>;

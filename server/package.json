@@ -10,7 +10,7 @@
     "seed": "npm run tsnode -- seeds/seeder.ts",
     "tsnode": "NODE_OPTIONS='--abort-on-uncaught-exception' ts-node -r dotenv/config",
     "test": "jest",
-    "schemats": "schemats postgres postgres://postgres@localhost/villi-dev -C -o \"../shared/src/generated/db.ts\" -f \"../types\" --no-throw-on-missing-type --tables vendor location vendor_location tagged photo entity_photo product"
+    "schemats": "schemats postgres postgres://postgres@localhost/villi-dev -C -o \"../shared/src/generated/db.ts\" -f \"../types\" --no-throw-on-missing-type --tables vendor location vendor_location tagged photo entity_photo product product_collection product_in_collection"
   },
   "devDependencies": {
     "@kristiandupont/recase": "1.1.2",
@@ -26,6 +26,7 @@
     "@types/koa-router": "7.4.4",
     "@types/koa-static": "4.0.2",
     "@types/lodash": "4.14.182",
+    "@types/mime-types": "2.1.1",
     "@types/node": "17.0.42",
     "@types/node-fetch": "2.6.1",
     "@types/node-geocoder": "3.24.4",
@@ -54,6 +55,7 @@
     "koa-static": "5.0.0",
     "kysely": "0.19.6",
     "lodash": "4.17.21",
+    "mime-types": "2.1.35",
     "node-fetch": "2.6.7",
     "node-geocoder": "4.0.0",
     "node-pg-migrate": "6.2.2",

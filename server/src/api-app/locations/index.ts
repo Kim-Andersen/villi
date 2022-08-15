@@ -3,8 +3,8 @@ import httpStatus from 'http-status';
 import Koa from 'koa';
 import Router from 'koa-router';
 import { pick } from 'lodash';
-import { locationService, photoService } from '../../services';
-import { entityPhotoInputSchema, LocationId, locationInputSchema, LocationSearch, locationSearchSchema, parseId, PhotoId } from '../../shared';
+import { locationService } from '../../services';
+import { LocationId, locationInputSchema, LocationSearch, locationSearchSchema, parseId } from '../../shared';
 
 const log = debug('/locations');
 
@@ -60,37 +60,6 @@ router.delete('/:locationId', async (ctx: Koa.Context) => {
   const locationId = parseId<LocationId>(ctx.params.locationId);
   log('delete location', { locationId });
   await locationService.deleteLocation(locationId);
-  ctx.body = {};
-  ctx.status = httpStatus.OK;
-});
-
-router.get('/:locationId/photos', async (ctx: Koa.Context) => {
-  const locationId = parseId<LocationId>(ctx.params.locationId);
-  log('get location photos', { locationId });
-
-  ctx.body = await photoService.findAllEntityPhotos('location_id', locationId);
-  ctx.status = httpStatus.OK;
-});
-
-router.post('/:locationId/photos/:photoId', async (ctx: Koa.Context) => {
-  const input = entityPhotoInputSchema.parse({ 
-    location_id: parseId<LocationId>(ctx.params.locationId),
-    photo_id: parseId<PhotoId>(ctx.params.photoId)
-  });
-  log('add vendor photo', { input });
-
-  ctx.body = await photoService.addPhotoToEntity(input);
-  ctx.status = httpStatus.OK;
-});
-
-router.delete('/:locationId/photos/photoId', async (ctx: Koa.Context) => {
-  const input = entityPhotoInputSchema.parse({ 
-    location_id: parseId<LocationId>(ctx.params.locationId),
-    photo_id: parseId<PhotoId>(ctx.params.photoId)
-  });
-  log('remove vendor photo', { input });
-
-  await photoService.removePhotoFromEntity(input);
   ctx.body = {};
   ctx.status = httpStatus.OK;
 });

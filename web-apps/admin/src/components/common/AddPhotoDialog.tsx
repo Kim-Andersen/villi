@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { photoService } from '../../services';
 import { Photo, PhotoSizes } from '../../shared';
 import photoHelper from '../../shared/photoHelper';
+import DownloadWebPhoto from './DownloadWebPhoto';
 import UploadPhoto from './UploadPhoto';
 
 type Props = {
@@ -24,6 +25,11 @@ export default function AddPhotoDialog({ onClose, sizes }: Props): React.ReactEl
   async function handleUploadPhoto(file: File): Promise<void> {
     setFile(file);
   }
+
+  async function handleDownloadPhoto(url: string) {
+    const photo = await photoService.uploadPhoto(null, { sizes, url });
+    onClose(photo);
+  }
   
   async function onUploadClick() {
     if (file) {
@@ -39,6 +45,7 @@ export default function AddPhotoDialog({ onClose, sizes }: Props): React.ReactEl
       <DialogTitle>Add a photo</DialogTitle>
       <DialogContent>
         <UploadPhoto onUpload={handleUploadPhoto} disabled={photoService.isWorking} maxSize={maxSize} />
+        <DownloadWebPhoto onDownload={handleDownloadPhoto} />
       </DialogContent>
       <DialogActions>
         <LoadingButton sx={{ minWidth: 100 }} loading={photoService.isWorking} disabled={file === null} variant='contained' onClick={onUploadClick}>Save</LoadingButton>

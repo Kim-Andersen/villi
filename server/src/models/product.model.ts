@@ -32,6 +32,8 @@ export default class ProductModel extends ModelBase implements IProductModel {
   }
 
   public async insert(input: ProductInput): Promise<Product> {
+    this.log('insert', { input });
+
     return await this.db
       .insertInto('product')
       .values(input)
@@ -40,7 +42,7 @@ export default class ProductModel extends ModelBase implements IProductModel {
   }
 
   public async update(id: ProductId, input: ProductInput): Promise<Pick<Product, "updated_at">> {
-    this.log('delete', { id, input });
+    this.log('update', { id, input });
 
     return await this.db
       .updateTable('product')

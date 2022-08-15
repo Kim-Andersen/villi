@@ -23,6 +23,10 @@ class BackendAPI implements IBackendAPI {
     return this.makeRequest<PayloadType>(resource, 'put', { body: body === null ? undefined : body, raw });
   }
 
+  public async patch<PayloadType>(resource: string, body: object | null, raw?: any): Promise<APIResponse<PayloadType, unknown>> {
+    return this.makeRequest<PayloadType>(resource, 'put', { body: body === null ? undefined : body, raw });
+  }
+
   public async delete<PayloadType>(resource: string): Promise<APIResponse<PayloadType, unknown>> {
     return this.makeRequest<PayloadType>(resource, 'delete');
   }

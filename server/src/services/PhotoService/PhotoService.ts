@@ -2,13 +2,10 @@ import debug from 'debug';
 import { unlink } from 'fs-extra';
 import sharp from 'sharp';
 import { IEntityPhotoModel, IPhotoModel } from '../../models';
-import { EntityPhoto, EntityPhotoInput, LocationId, Photo, PhotoId, photoInputSchema, PhotoSizes, ProductId, VendorId, VendorLocationId } from '../../shared';
+import { EntityPhotoDetails, EntityPhotoInput, entityPhotoSearchSchema, EntityType, Photo, PhotoId, photoInputSchema, PhotoSizes } from '../../shared';
 import photoHelper from '../../shared/photoHelper';
 import { IObjectStorage } from '../ObjectStorage/types';
-import { IPhotoService } from './types';
-
-type EntityType = 'vendor_id' | 'location_id' | 'vendor_location_id' | 'product_id';
-type EntityId = VendorId | LocationId | VendorLocationId | ProductId;
+import { EntityId, IPhotoService } from './types';
 
 export default class PhotoService implements IPhotoService {
   private readonly bucket = 'villi-photos';
@@ -24,14 +21,14 @@ export default class PhotoService implements IPhotoService {
     this.objectStorage.ensureBucket(this.bucket);
   }
 
-  public async findAllEntityPhotos(entityType: EntityType, entityId: EntityId): Promise<Photo[]> {
-    return this.entityPhotoModel.findAll({ [entityType]: entityId });
+  public async findAllEntityPhotos(entityType: EntityType, entityId: EntityId): Promise<EntityPhotoDetails[]> {
+    return this.entityPhotoModel.findAll(entityPhotoSearchSchema.parse({ entityType, entityId }));
   }
   
   /**
    * Associate a photo to an entity, ie. a vendor or a location.
    */
-  public async addPhotoToEntity(input: EntityPhotoInput): Promise<EntityPhoto> {
+  public async addPhotoToEntity(input: EntityPhotoInput): Promise<EntityPhotoDetails> {
     this.log('addPhotoToEntity', { input });
     return this.entityPhotoModel.insert(input);
   }

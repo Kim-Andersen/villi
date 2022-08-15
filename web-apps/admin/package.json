@@ -28,6 +28,7 @@
     "@types/react": "^18.0.12",
     "@types/react-dom": "^18.0.5",
     "autosuggest-highlight": "3.2.1",
+    "currency-codes": "2.1.0",
     "dayjs": "1.11.3",
     "lodash": "4.17.21",
     "observable-hooks": "4.2.0",

@@ -29,9 +29,9 @@ export default function VendorLocationList({ vendorLocations, onItemClick, onDel
       <Table sx={{ minWidth: 650 }}>
         <TableHead>
           <TableRow>
-            <TableCell>Types</TableCell>
             <TableCell>Name</TableCell>
             <TableCell>Address</TableCell>
+            <TableCell>Types</TableCell>
             <TableCell></TableCell>
           </TableRow>
         </TableHead>
@@ -45,9 +45,9 @@ export default function VendorLocationList({ vendorLocations, onItemClick, onDel
               hover
               onClick={() => onItemClick(vendorLocation)}
             >
-              <TableCell>{join(types, ', ')}</TableCell>
               <TableCell><strong>{name}</strong></TableCell>
               <TableCell>{street_name} {street_number}, {postal_code} {city}</TableCell>
+              <TableCell>{join(types, ', ')}</TableCell>
               <TableCell align="right">
                 <IconButton onClick={(event) => handleDeleteClick(id as VendorLocationId, event)}>
                   <DeleteIcon color="error" />

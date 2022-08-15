@@ -1,7 +1,7 @@
 import LoadingButton from '@mui/lab/LoadingButton';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import { isEqual, pick } from 'lodash';
+import { isEqual, omit } from 'lodash';
 import React, { useState } from 'react';
 import { useOutletContext } from "react-router-dom";
 import { backendAPI } from '../../api/backendAPI';
@@ -14,9 +14,7 @@ import TimeAgo from '../common/TimeAgo';
 
 export default function EditVendorInfo(): React.ReactElement {
   const vendor = useOutletContext<Vendor>();
-  const [vendorInput, setVendorInput] = useState<VendorInput>(  
-    pick(vendor, ['name', 'description', 'website_url', 'instagram_url', 'facebook_url', 'youtube_url'])
-  );
+  const [vendorInput, setVendorInput] = useState<VendorInput>(omit(vendor, 'id', 'created_at', 'updated_at'));
   const [form, handleFormElementChange] = useForm<VendorInput>(vendorInput);
   const [lastSaved, setLastSaved] = useState<Date>(new Date(vendor.updated_at || vendor.created_at));
 
@@ -56,6 +54,30 @@ export default function EditVendorInfo(): React.ReactElement {
             variant="filled"
             multiline
             minRows={3}
+            fullWidth
+          />
+        </Grid>
+
+        <Grid item xs={12}>
+          <TextField
+            name="email"
+            type="email"
+            label="E-mail"
+            value={form.email || ''}
+            onChange={handleFormElementChange}
+            variant="filled"
+            fullWidth
+          />
+        </Grid>
+
+        <Grid item xs={12}>
+          <TextField
+            name="phone"
+            type="text"
+            label="Phone"
+            value={form.phone || ''}
+            onChange={handleFormElementChange}
+            variant="filled"
             fullWidth
           />
         </Grid>

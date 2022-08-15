@@ -1,4 +1,4 @@
-import { EntityPhoto, EntityPhotoInput, EntityPhotoSearch, Location, LocationId, LocationInput, LocationSearch, Photo, PhotoId, PhotoInput, PhotoSearch, Product, ProductId, ProductInput, Tagged, TaggedSearch, Vendor, VendorId, VendorInput, VendorLocation, VendorLocationDetails, VendorLocationId, VendorLocationInput, VendorLocationSearch, VendorSearch } from '../shared';
+import { EntityPhotoDetails, EntityPhotoInput, EntityPhotoSearch, Location, LocationId, LocationInput, LocationSearch, Photo, PhotoId, PhotoInput, PhotoSearch, Product, ProductCollection, ProductCollectionId, ProductCollectionInput, ProductCollectionSearch, ProductId, ProductInCollection, ProductInCollectionsInput, ProductInCollectionsSearch, ProductInput, Tagged, TaggedSearch, Vendor, VendorId, VendorInput, VendorLocation, VendorLocationDetails, VendorLocationId, VendorLocationInput, VendorLocationSearch, VendorSearch } from '../shared';
 
 export interface IVendorModel {
   findById(id: VendorId): Promise<Vendor>;
@@ -43,8 +43,8 @@ export interface IPhotoModel {
 }
 
 export interface IEntityPhotoModel {
-  findAll(search: EntityPhotoSearch): Promise<Photo[]>;
-  insert(input: EntityPhotoInput): Promise<EntityPhoto>;
+  findAll(search: EntityPhotoSearch): Promise<EntityPhotoDetails[]>;
+  insert(input: EntityPhotoInput): Promise<EntityPhotoDetails>;
   delete(input: EntityPhotoInput): Promise<void>;
   countPhotoEntities(photo_id: PhotoId): Promise<number>;
 }
@@ -55,4 +55,15 @@ export interface IProductModel {
   insert(input: ProductInput): Promise<Product>;
   update(id: ProductId, input: ProductInput): Promise<Pick<Product, 'updated_at'>>;
   delete(productId: ProductId): Promise<void>;
+}
+export interface IProductCollectionModel {
+  findAll(search: ProductCollectionSearch): Promise<ProductCollection[]>;
+  insert(input: ProductCollectionInput): Promise<ProductCollection>;
+  update(id: ProductCollectionId, input: ProductCollectionInput): Promise<ProductCollection>;
+  delete(id: ProductCollectionId): Promise<void>;
+}
+
+export interface IProductInCollectionModel {
+  findAll(search: ProductInCollectionsSearch): Promise<Omit<ProductInCollection, 'id'>[]>;
+  upsert(input: ProductInCollectionsInput): Promise<void>;
 }

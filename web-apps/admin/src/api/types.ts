@@ -9,5 +9,6 @@ export interface IBackendAPI {
   get<PayloadType>(resource: string): Promise<APIResponse<PayloadType, unknown>>;
   post<PayloadType>(resource: string, body: object | null, raw?: any): Promise<APIResponse<PayloadType, unknown>>;
   put<PayloadType>(resource: string, body: object | null, raw?: any): Promise<APIResponse<PayloadType, unknown>>;
+  patch<PayloadType>(resource: string, body: object | null, raw?: any): Promise<APIResponse<PayloadType, unknown>>;
   delete<PayloadType>(resource: string): Promise<APIResponse<PayloadType, unknown>>;
 }

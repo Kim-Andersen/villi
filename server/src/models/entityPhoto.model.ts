@@ -1,6 +1,6 @@
 import { debug } from 'debug';
 import type { Database } from '../database';
-import { EntityPhoto, EntityPhotoInput, EntityPhotoSearch, Photo, PhotoId } from '../shared';
+import { EntityPhotoDetails, EntityPhotoInput, EntityPhotoSearch, PhotoId } from '../shared';
 import { ModelBase } from './ModelBase';
 import { IEntityPhotoModel } from './types';
 
@@ -22,40 +22,50 @@ export default class EntityPhotoModel extends ModelBase implements IEntityPhotoM
     return Number(count); // TODO: For some reason "count" is returned as a string.
   }
 
-  public async findAll(search: EntityPhotoSearch): Promise<Photo[]> {
+  public async findAll(search: EntityPhotoSearch): Promise<EntityPhotoDetails[]> {
     let query = this.db
       .selectFrom('photo')
       .innerJoin('entity_photo', 'entity_photo.photo_id', 'photo.id')
-      .selectAll(['photo']);
+      .select('entity_photo.type')
+      .selectAll('photo');
     
     if (search.photo_id) {
       query = query.where('entity_photo.photo_id', '=', search.photo_id)
     }
-    if (search.vendor_id) {
-      query = query.where('entity_photo.vendor_id', '=', search.vendor_id)
+
+    if (search.entityType === 'vendor') {
+      query = query.where('entity_photo.vendor_id', '=', search.entityId)
+    } else if (search.entityType === 'location') {
+      query = query.where('entity_photo.location_id', '=', search.entityId)
+    } else if (search.entityType === 'vendor_location') {
+      query = query.where('entity_photo.vendor_location_id', '=', search.entityId)
+    } else if (search.entityType === 'product') {
+      query = query.where('entity_photo.product_id', '=', search.entityId)
     }
-    if (search.location_id) {
-      query = query.where('entity_photo.location_id', '=', search.location_id)
-    }
-    if (search.vendor_location_id) {
-      query = query.where('entity_photo.vendor_location_id', '=', search.vendor_location_id)
-    }
-    
+
     return query.execute();
   }
 
-  public async insert(input: EntityPhotoInput): Promise<EntityPhoto> {
+  public findOneById(id: number): Promise<EntityPhotoDetails> {
+    return this.db
+      .selectFrom('photo')
+      .innerJoin('entity_photo', 'entity_photo.photo_id', 'photo.id')
+      .select('entity_photo.type')
+      .selectAll('photo')
+      .where('entity_photo.id', '=', id)
+      .executeTakeFirstOrThrow();
+  }
+
+  public async insert(input: EntityPhotoInput): Promise<EntityPhotoDetails> {
     this.log('insert', { input });
 
-    return this.db
+    const { id } = await this.db
       .insertInto('entity_photo')
       .values(input)
-      // .onConflict((oc) => oc
-      //   .columns(['entity_id', 'entity_type', 'photo_id'])
-      //   .doUpdateSet(input)
-      // )
-      .returningAll()
+      .returning('id')
       .executeTakeFirstOrThrow();
+
+    return this.findOneById(id);
   }
 
   public async delete(input: EntityPhotoInput): Promise<void> {

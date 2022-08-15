@@ -12,9 +12,11 @@ import EditVendorInfo from './components/vendor/EditVendorInfo';
 import EditVendorLocations from './components/vendor/EditVendorLocations';
 import EditVendorPhotos from './components/vendor/EditVendorPhotos';
 import EditVendorTags from './components/vendor/EditVendorTags';
+import VendorProducts from './components/vendor/VendorProducts';
 import Home from './home/Home';
 import ScrollToTop from './ScrollToTop';
 import snackbarService, { SnackbarOptions } from './snackbar/snackbarService';
+import EditProduct from './views/EditProduct';
 import VendorDetails from './views/VendorDetails';
 import Vendors from './views/Vendors';
 
@@ -30,7 +32,6 @@ function App(): React.ReactElement {
   }
   
   return (
-    
       <div id="app">
         <div id="app-progress">
           {working && <LinearProgress />}
@@ -50,6 +51,8 @@ function App(): React.ReactElement {
                 <Route path="locations" element={<EditVendorLocations />}></Route>
                 <Route path="photos" element={<EditVendorPhotos />}></Route>
                 <Route path="tags" element={<EditVendorTags />}></Route>
+                <Route path="products" element={<VendorProducts />}></Route>
+                <Route path="products/:productId" element={<EditProduct />}></Route>
               </Route>
               <Route path="/" element={<Home />}></Route>
             </Routes>
