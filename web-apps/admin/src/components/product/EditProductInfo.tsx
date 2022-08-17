@@ -1,8 +1,8 @@
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import React from 'react';
 import useForm from '../../hooks/useForm';
 import { Product } from '../../shared';
+import TextField from '../common/TextField';
 
 type ProductProps = Pick<Product, 'title' | 'description'>;
 
@@ -23,8 +23,6 @@ export default function EditProductInfo({ product, onChange }: Props): React.Rea
           label="Title"
           value={form.title}
           onChange={handleFormElementChange}
-          variant="filled"
-          fullWidth
         />
       </Grid>
 
@@ -34,10 +32,8 @@ export default function EditProductInfo({ product, onChange }: Props): React.Rea
           label="Description"
           value={form.description || ''}
           onChange={handleFormElementChange}
-          variant="filled"
           multiline
           minRows={3}
-          fullWidth
         />
       </Grid>
       </React.Fragment>

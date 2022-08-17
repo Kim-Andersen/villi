@@ -1,12 +1,13 @@
 
-import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
+import MenuItem from '@mui/material/MenuItem';
+import Stack from '@mui/material/Stack';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { backendAPI } from '../api/backendAPI';
+import BurgerMenu from '../components/common/BurgerMenu';
 import { vendorService } from '../services';
 import { parseId, Vendor, VendorId } from '../shared';
 
@@ -24,8 +25,8 @@ export default function VendorDetails(): React.ReactElement {
     setVendor(vendor);
   }, [vendorId]);
 
-  async function onDeleteClick() {
-    if (window.confirm('Sure you want to permanantly delete this vendor?')) {
+  async function handleDeleteClick() {
+    if (window.confirm('Sure you want to delete this vendor?')) {
       await vendorService.deleteVendor(vendorId);
       navigate('/vendors');
     }
@@ -38,8 +39,13 @@ export default function VendorDetails(): React.ReactElement {
   if (vendor) {
     return (
       <React.Fragment>
-        <Typography variant="h4">{vendor.name}</Typography>
-        <LoadingButton sx={{ minWidth: 100 }} loading={backendAPI.isWorking} variant='outlined' color="error" onClick={onDeleteClick}>Delete</LoadingButton>
+        <Stack direction="row" spacing={1}>
+          <Typography variant="h4">{vendor.name}</Typography>
+          <BurgerMenu>
+            <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
+          </BurgerMenu>
+        </Stack>
+        {/* <LoadingButton sx={{ minWidth: 100 }} loading={backendAPI.isWorking} variant='outlined' color="error" onClick={onDeleteClick}>Delete</LoadingButton> */}
 
         <Box sx={{ width: '100%', typography: 'body1' }}>
           <Tabs value={tabIndex}>

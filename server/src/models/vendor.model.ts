@@ -1,9 +1,10 @@
 import { debug } from 'debug';
-import { sql } from 'kysely';
-import type { Database } from '../database';
+import { SelectQueryBuilder, sql } from 'kysely';
+import { From } from 'kysely/dist/cjs/parser/table-parser';
+import type { Database, Kyselyfied } from '../database';
 import { Vendor, VendorId, VendorInput, VendorSearch } from '../shared';
 import { ModelBase } from './ModelBase';
-import { IVendorModel } from './types';
+import { IVendorModel, VendorDeleteOptions, VendorSearchOptions } from './types';
 
 export default class VendorModel extends ModelBase implements IVendorModel {
   private readonly log = debug(VendorModel.name);
@@ -12,44 +13,36 @@ export default class VendorModel extends ModelBase implements IVendorModel {
     super();
   }
 
-  public async findById(id: VendorId): Promise<Vendor> {
+  public async findById(id: VendorId, options: VendorSearchOptions = {}): Promise<Vendor> {
     this.log('findById', { id });
 
-    return await this.db
+    const { includedDeleted } = options;
+
+    let query = this.db
       .selectFrom('vendor')
-      .where('vendor.id', '=', id)
+      .where('vendor.id', '=', id);
+    
+    if (includedDeleted !== true) {
+      query = query.where('deleted_at', 'is', null);
+    }
+
+    return query
       .selectAll('vendor')
       .executeTakeFirstOrThrow();
   }
 
-  public async findOne(search: VendorSearch): Promise<Vendor> {
+  public async findOne(search: VendorSearch, options: VendorSearchOptions = {}): Promise<Vendor> {
     this.log('findOne', { search });
-    const { name, description, website_url, facebook_url, instagram_url } = search;
-
-    let query = this.db.selectFrom('vendor');
-    query = name ? query.where(sql`LOWER(name)`, 'like', '%' + name.toLowerCase() + '%') : query;
-    query = description ? query.where(sql`LOWER(description)`, 'like', '%' + description.toLowerCase() + '%') : query;
-    query = facebook_url ? query.where(sql`LOWER(facebook_url)`, 'like', '%' + facebook_url.toLowerCase() + '%') : query;
-    query = instagram_url ? query.where(sql`LOWER(instagram_url)`, 'like', '%' + instagram_url.toLowerCase() + '%') : query;
-    query = website_url ? query.where(sql`LOWER(website_url)`, 'like', '%' + website_url.toLowerCase() + '%') : query;
-
-    return query
+    
+    return this.buildSearchQuery(search, options)
       .selectAll('vendor')
       .executeTakeFirstOrThrow();
   }
 
-  public async findAll(search: VendorSearch): Promise<Vendor[]> {
+  public async findAll(search: VendorSearch, options: VendorSearchOptions = {}): Promise<Vendor[]> {
     this.log('findAll', { search });
-    const { name, description, website_url, facebook_url, instagram_url } = search;
-
-    let query = this.db.selectFrom('vendor');
-    query = name ? query.where(sql`LOWER(name)`, 'like', '%' + name.toLowerCase() + '%') : query;
-    query = description ? query.where(sql`LOWER(description)`, 'like', '%' + description.toLowerCase() + '%') : query;
-    query = facebook_url ? query.where(sql`LOWER(facebook_url)`, 'like', '%' + facebook_url.toLowerCase() + '%') : query;
-    query = instagram_url ? query.where(sql`LOWER(instagram_url)`, 'like', '%' + instagram_url.toLowerCase() + '%') : query;
-    query = website_url ? query.where(sql`LOWER(website_url)`, 'like', '%' + website_url.toLowerCase() + '%') : query;
-
-    return query
+    
+    return this.buildSearchQuery(search, options)
       .selectAll('vendor')
       .execute();
   }
@@ -76,12 +69,36 @@ export default class VendorModel extends ModelBase implements IVendorModel {
       .executeTakeFirstOrThrow();
   }
 
-  public async deleteVendor(id: VendorId): Promise<void> {
-    this.log('deleteVendor', { id });
+  public async deleteVendor(vendorId: VendorId, { permanently }: VendorDeleteOptions = { permanently: false }): Promise<void> {
+    this.log('deleteVendor', { vendorId });
 
-    await this.db
-      .deleteFrom('vendor')
-      .where('vendor.id', '=', id)
-      .executeTakeFirstOrThrow();
+    if (permanently === true) {
+      await this.db
+        .deleteFrom('vendor')
+        .where('vendor.id', '=', vendorId)
+        .executeTakeFirstOrThrow();
+    } else {
+      await this.db
+        .updateTable('vendor')
+        .set({ deleted_at: new Date() })
+        .where('id', '=', vendorId)
+        .executeTakeFirstOrThrow();
+    }
+  }
+
+  private buildSearchQuery(search: VendorSearch, options: VendorSearchOptions): SelectQueryBuilder<From<Kyselyfied, "vendor">, "vendor", {}> {
+    const { name, description, website_url, facebook_url, instagram_url } = search;
+    const { includedDeleted } = options;
+
+    let query = this.db.selectFrom('vendor');
+
+    query = includedDeleted !== true ? query.where('deleted_at', 'is', null) : query;
+    query = name ? query.where(sql`LOWER(name)`, 'like', '%' + name.toLowerCase() + '%') : query;
+    query = description ? query.where(sql`LOWER(description)`, 'like', '%' + description.toLowerCase() + '%') : query;
+    query = facebook_url ? query.where(sql`LOWER(facebook_url)`, 'like', '%' + facebook_url.toLowerCase() + '%') : query;
+    query = instagram_url ? query.where(sql`LOWER(instagram_url)`, 'like', '%' + instagram_url.toLowerCase() + '%') : query;
+    query = website_url ? query.where(sql`LOWER(website_url)`, 'like', '%' + website_url.toLowerCase() + '%') : query;
+
+    return query;
   }
 }

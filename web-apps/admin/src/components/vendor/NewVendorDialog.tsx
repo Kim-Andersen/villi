@@ -3,10 +3,10 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
 import React from 'react';
 import useForm from '../../hooks/useForm';
 import { VendorInput } from '../../shared';
+import TextField from '../common/TextField';
 
 
 type Props = {
@@ -32,12 +32,9 @@ export default function NewVendorDialog(props: Props): React.ReactElement {
       <DialogContent>
         <TextField
           autoFocus
-          margin="dense"
           name="name"
           label="Name of the vendor"
           type="text"
-          fullWidth
-          variant="filled"
           value={form.name}
           onChange={handleFormElementChange}
         />

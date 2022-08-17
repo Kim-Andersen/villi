@@ -28,13 +28,14 @@ export default function EditProductAvailability({ product, onChange }: Props): R
         <Typography variant='h6' component='div'>Availability</Typography>
       </Grid>
       <Grid item xs={12}>
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Age</InputLabel>
+        <FormControl fullWidth size='small'>
+          <InputLabel>Channel</InputLabel>
           <Select
             name="channel"
+            label='Channel'
             value={form.channel}
-            label="Age"
             onChange={handleChange}
+            variant="filled" fullWidth size='small' margin="dense"
           >
             <MenuItem value='local'>Local</MenuItem>
             <MenuItem value='online' disabled>Online</MenuItem>

@@ -1,11 +1,11 @@
 import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import cc from 'currency-codes';
 import React from 'react';
 import useForm from '../../hooks/useForm';
 import { Product } from '../../shared';
+import TextField from '../common/TextField';
 
 type ProductProps = Pick<Product, 'price' | 'sale_price'>;
 
@@ -30,8 +30,6 @@ export default function EditProductPrice({ product, currency, onChange }: Props)
           label="Price"
           value={form.price ?? ''}
           onChange={handleFormElementChange}
-          variant="filled"
-          fullWidth
           inputProps={{ type: 'number', step: 'any' }}
           InputProps={{
             startAdornment: <InputAdornment position="start">{cc.number(String(currency))?.code}</InputAdornment>
@@ -45,8 +43,6 @@ export default function EditProductPrice({ product, currency, onChange }: Props)
           label="Sale price"
           value={form.sale_price ?? ''}
           onChange={handleFormElementChange}
-          variant="filled"
-          fullWidth
           inputProps={{ type: 'number', step: 'any' }}
           InputProps={{
             startAdornment: <InputAdornment position="start">{cc.number(String(currency))?.code}</InputAdornment>

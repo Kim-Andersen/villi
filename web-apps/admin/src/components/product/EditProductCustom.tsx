@@ -1,9 +1,9 @@
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import useForm from '../../hooks/useForm';
 import { Product } from '../../shared';
+import TextField from '../common/TextField';
 
 type ProductProps = Pick<Product, 'offer_id'>;
 
@@ -23,12 +23,9 @@ export default function EditProductCustom({ product, onChange }: Props): React.R
       <Grid item xs={12}>
         <TextField
           name="offer_id"
-          required
           label="Offer ID"
           value={form.offer_id}
           onChange={handleFormElementChange}
-          variant="filled"
-          fullWidth
           inputProps={{ maxLength: 50 }}
           helperText={`Vendor's own product/offer id (SKU etc).`}
         />

@@ -1,6 +1,5 @@
 import LoadingButton from '@mui/lab/LoadingButton';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import { isEqual, omit } from 'lodash';
 import React, { useState } from 'react';
 import { useOutletContext } from "react-router-dom";
@@ -10,6 +9,7 @@ import { vendorService } from '../../services';
 import { Vendor, VendorId, VendorInput } from '../../shared';
 
 import ActionBar from '../common/ActionBar';
+import TextField from '../common/TextField';
 import TimeAgo from '../common/TimeAgo';
 
 export default function EditVendorInfo(): React.ReactElement {
@@ -31,7 +31,7 @@ export default function EditVendorInfo(): React.ReactElement {
         <LoadingButton sx={{ minWidth: 100 }} loading={backendAPI.isWorking} disabled={isEqual(form, vendorInput)} variant='contained' onClick={onSaveClick}>Save</LoadingButton>
       </ActionBar>
     
-      <Grid container spacing={4}>
+      <Grid container spacing={2}>
         <Grid item xs={12}>
           <TextField
             autoFocus
@@ -40,8 +40,6 @@ export default function EditVendorInfo(): React.ReactElement {
             label="Name"
             value={form.name}
             onChange={handleFormElementChange}
-            variant="filled"
-            fullWidth
           />
         </Grid>
 
@@ -51,10 +49,8 @@ export default function EditVendorInfo(): React.ReactElement {
             label="Description"
             value={form.description || ''}
             onChange={handleFormElementChange}
-            variant="filled"
             multiline
             minRows={3}
-            fullWidth
           />
         </Grid>
 
@@ -65,8 +61,6 @@ export default function EditVendorInfo(): React.ReactElement {
             label="E-mail"
             value={form.email || ''}
             onChange={handleFormElementChange}
-            variant="filled"
-            fullWidth
           />
         </Grid>
 
@@ -77,8 +71,6 @@ export default function EditVendorInfo(): React.ReactElement {
             label="Phone"
             value={form.phone || ''}
             onChange={handleFormElementChange}
-            variant="filled"
-            fullWidth
           />
         </Grid>
 
@@ -89,8 +81,6 @@ export default function EditVendorInfo(): React.ReactElement {
             label="Website"
             value={form.website_url || ''}
             onChange={handleFormElementChange}
-            variant="filled"
-            fullWidth
             placeholder='Ex: https://www.myfarm.com'
             helperText="Website address"
           />
@@ -103,8 +93,6 @@ export default function EditVendorInfo(): React.ReactElement {
             label="Instagram"
             value={form.instagram_url || ''}
             onChange={handleFormElementChange}
-            variant="filled"
-            fullWidth
             placeholder='Ex: https://www.instagram.com/my_farm'
             helperText="Instagram profile address"
           />
@@ -117,8 +105,6 @@ export default function EditVendorInfo(): React.ReactElement {
             label="Facebook"
             value={form.facebook_url || ''}
             onChange={handleFormElementChange}
-            variant="filled"
-            fullWidth
             placeholder='Ex: https://www.facebook.com/myfarm'
             helperText="Facebook profile address"
           />
@@ -131,8 +117,6 @@ export default function EditVendorInfo(): React.ReactElement {
             label="Youtube"
             value={form.youtube_url || ''}
             onChange={handleFormElementChange}
-            variant="filled"
-            fullWidth
             placeholder='Ex: https://www.youtube.com/myfarm'
             helperText="Youtube profile address"
           />

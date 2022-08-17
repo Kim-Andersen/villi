@@ -1,12 +1,22 @@
 import { EntityPhotoDetails, EntityPhotoInput, EntityPhotoSearch, Location, LocationId, LocationInput, LocationSearch, Photo, PhotoId, PhotoInput, PhotoSearch, Product, ProductCollection, ProductCollectionId, ProductCollectionInput, ProductCollectionSearch, ProductId, ProductInCollection, ProductInCollectionsInput, ProductInCollectionsSearch, ProductInput, Tagged, TaggedSearch, Vendor, VendorId, VendorInput, VendorLocation, VendorLocationDetails, VendorLocationId, VendorLocationInput, VendorLocationSearch, VendorSearch } from '../shared';
 
+export type VendorDeleteOptions = {
+  /**
+   * Set to true to permanently delete the vendor.
+   * Otherwise the `deleted_at` flag will be set, thus not actually deleting the vendor.
+   */
+  permanently: boolean;
+};
+
+export type VendorSearchOptions = { includedDeleted?: boolean; };
+
 export interface IVendorModel {
-  findById(id: VendorId): Promise<Vendor>;
-  findOne(search: VendorSearch): Promise<Vendor>;
-  findAll(search: VendorSearch): Promise<Vendor[]>
+  findById(id: VendorId, options?: VendorSearchOptions): Promise<Vendor>;
+  findOne(search: VendorSearch, options?: VendorSearchOptions): Promise<Vendor>;
+  findAll(search: VendorSearch, options?: VendorSearchOptions): Promise<Vendor[]>
   insertVendor(insert: VendorInput): Promise<VendorId>;
   updateVendor(id: VendorId, update: VendorInput): Promise<Pick<Vendor, 'updated_at'>>;
-  deleteVendor(id: VendorId): Promise<void>;
+  deleteVendor(id: VendorId, options?: VendorDeleteOptions): Promise<void>;
 }
 
 export interface ILocationModel {

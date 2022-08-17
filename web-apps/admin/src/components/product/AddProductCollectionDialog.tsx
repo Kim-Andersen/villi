@@ -4,10 +4,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import React from 'react';
 import useForm from '../../hooks/useForm';
 import { ProductCollectionInput } from '../../shared';
+import TextField from '../common/TextField';
 
 type Props = {
   onClose: (data?: Pick<ProductCollectionInput, 'name' | 'description'>) => void;
@@ -36,9 +36,6 @@ export default function AddProductCollectionDialog({ onClose }: Props): React.Re
               required
               value={form.name}
               onChange={handleFormElementChange}
-              variant="filled"
-              fullWidth
-              size='small'
               label='Name'
             />
           </Grid>
@@ -48,10 +45,8 @@ export default function AddProductCollectionDialog({ onClose }: Props): React.Re
               label="Description"
               value={form.description || ''}
               onChange={handleFormElementChange}
-              variant="filled"
               multiline
               minRows={3}
-              fullWidth
             />
           </Grid>
         </Grid>

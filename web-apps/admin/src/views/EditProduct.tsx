@@ -84,7 +84,7 @@ export default function EditProduct(): React.ReactElement {
         <DeleteIcon />
       </IconButton>
 
-      <Grid container spacing={4}>
+      <Grid container spacing={2}>
         {product && renderEditProduct(product)}
       </Grid>
 

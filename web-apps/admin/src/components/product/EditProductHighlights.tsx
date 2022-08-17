@@ -3,10 +3,10 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 import { Product } from '../../shared';
+import TextField from '../common/TextField';
 
 type ProductProps = Pick<Product, 'highlights'>;
 
@@ -48,12 +48,9 @@ export default function EditProductHighlights({ product, onChange }: Props): Rea
         <Grid item xs={12} key={index}>
           <TextField
             name="price"
-            required
             label="Highlight"
             value={highlight}
             onChange={handleChange}
-            variant="filled"
-            fullWidth
             inputProps={{ 'data-index': index }}
             InputProps={{
               endAdornment: 

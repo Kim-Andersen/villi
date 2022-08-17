@@ -4,6 +4,7 @@ import { Pool } from 'pg';
 import config from '../config';
 import { Tables } from '../shared/generated/db';
 
+
 /**
  * Sets `Generated<T>` for `id` and `created_at` properties so they work correctly with kysely's type system.
  * 
@@ -15,11 +16,12 @@ type WithKyselyGeneratedType<T extends object> = {
     : T[K];
 };
 
-type Kyselyfy<T extends {[key: string]: any}> = {
+export type Kyselyfy<T extends {[key: string]: any}> = {
   [K in keyof T]: WithKyselyGeneratedType<T[K]>
 };
 
-export type Database = Kysely<Kyselyfy<Tables>>;
+export type Kyselyfied = Kyselyfy<Tables>;
+export type Database = Kysely<Kyselyfied>;
 
 const log = debug('database');
 
