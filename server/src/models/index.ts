@@ -1,5 +1,7 @@
 import { database } from '../database';
+import AccountModel from './Account.model';
 import EntityPhotoModel from './entityPhoto.model';
+import InvitationModel from './invitation.model';
 import LocationModel from './location.model';
 import PhotoModel from './photo.model';
 import ProductModel from './product.model';
@@ -19,3 +21,5 @@ export const entityPhotoModel = new EntityPhotoModel(database);
 export const productModel = new ProductModel(database);
 export const productCollectionModel = new ProductCollectionModel(database);
 export const productInCollectionModel = new ProductInCollectionModel(database);
+export const invitationModel = new InvitationModel(database);
+export const accountModel = new AccountModel(database);

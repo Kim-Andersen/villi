@@ -1,4 +1,4 @@
-import { EntityPhotoDetails, EntityPhotoInput, EntityPhotoSearch, Location, LocationId, LocationInput, LocationSearch, Photo, PhotoId, PhotoInput, PhotoSearch, Product, ProductCollection, ProductCollectionId, ProductCollectionInput, ProductCollectionSearch, ProductId, ProductInCollection, ProductInCollectionsInput, ProductInCollectionsSearch, ProductInput, Tagged, TaggedSearch, Vendor, VendorId, VendorInput, VendorLocation, VendorLocationDetails, VendorLocationId, VendorLocationInput, VendorLocationSearch, VendorSearch } from '../shared';
+import { Account, AccountId, AccountInput, AccountPatch, AccountSearch, EntityPhotoDetails, EntityPhotoInput, EntityPhotoSearch, Invitation, InvitationInput, InvitationSearch, Location, LocationId, LocationInput, LocationSearch, Photo, PhotoId, PhotoInput, PhotoSearch, Product, ProductCollection, ProductCollectionId, ProductCollectionInput, ProductCollectionSearch, ProductId, ProductInCollection, ProductInCollectionsInput, ProductInCollectionsSearch, ProductInput, Tagged, TaggedSearch, Vendor, VendorId, VendorInput, VendorLocation, VendorLocationDetails, VendorLocationId, VendorLocationInput, VendorLocationSearch, VendorSearch } from '../shared';
 
 export type VendorDeleteOptions = {
   /**
@@ -76,4 +76,15 @@ export interface IProductCollectionModel {
 export interface IProductInCollectionModel {
   findAll(search: ProductInCollectionsSearch): Promise<Omit<ProductInCollection, 'id'>[]>;
   upsert(input: ProductInCollectionsInput): Promise<void>;
+}
+
+export interface IInvitationModel {
+  insert(input: InvitationInput): Promise<Invitation>;
+  findOne(search: InvitationSearch): Promise<Invitation>;
+}
+
+export interface IAccountModel {
+  findOne(search: AccountSearch): Promise<Account | undefined>;
+  patch(id: AccountId, patch: AccountPatch): Promise<void>;
+  insert(input: AccountInput): Promise<Account>;
 }

@@ -1,13 +1,18 @@
+import httpStatus from 'http-status';
 import Koa from 'koa';
 import Router from 'koa-router';
+import { errorHandler } from '../api-app/errorHandler';
+import { emailAuthService } from '../services';
 
 const app = new Koa();
 const router = new Router();
 
 /** Routes */
-app.use(router.routes()).use(router.allowedMethods());
+app.use(router.routes())
+app.use(router.allowedMethods());
+app.use(errorHandler);
 
-router.get('/', async (ctx: Koa.Context, next: Koa.Next) => {
+router.get('/', async (ctx: Koa.Context) => {
   ctx.type = 'html';
   ctx.body = `
     <html>
@@ -21,8 +26,19 @@ router.get('/', async (ctx: Koa.Context, next: Koa.Next) => {
       </body>
     </html>
   `;
+});
 
-  await next();
+router.get('/login/email', async (ctx: Koa.Context) => {
+  const token = ctx.request.query.token as string;
+  try {
+    const sessionToken = await emailAuthService.loginWithEmailToken(token);
+    // TODO: Detect if it's a mobile device and redirect to the Villi app with the session token.
+    ctx.type = 'html';
+    ctx.body = `sessionToken: ${sessionToken}`;
+  } catch {
+    ctx.status = httpStatus.BAD_REQUEST;
+    ctx.body = 'Invalid email token';
+  }  
 });
 
 export const webApp = app;

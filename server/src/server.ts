@@ -7,6 +7,7 @@ import mount from 'koa-mount';
 import serveStatic from 'koa-static';
 import { join, normalize } from 'path';
 import { apiApp } from './api-app';
+import api_v1 from './api-v1';
 import config from './config';
 import { pool } from './database';
 import { webApp } from './web-app';
@@ -24,6 +25,7 @@ serverApp.use(mount('/public', serveStatic(config.publicDir)));
 serverApp.use(mount('/admin', serveStatic(normalize(join(config.publicDir, '/admin-app')))));
 serverApp.use(mount('/', webApp)); // Start with the "/" route so it doesn't catch all routes.
 serverApp.use(mount('/api', apiApp));
+serverApp.use(mount('/api/v1', api_v1));
 
 
 async function startServer() {
@@ -39,7 +41,7 @@ async function startServer() {
   }
 
   // All good, ready to listen to incoming requests.
-  const port = config.port;
+  const port = config.server.port;
   serverApp.listen(port, () => console.log(`✅  Server started on port ${port}`));
 }
 

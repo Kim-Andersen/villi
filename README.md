@@ -36,20 +36,29 @@ Seeds are database queries that insert seed data.
 Each seed is defiend in a `.sql` file in the `server/seeds` directory and must be added to `server/seeds/seeds.json` in order to get executed when running `npm run seed` in the `server` directory.
 
 ## Environement Variables
-- `PORT`: server port.
-- `DATABASE_URL`: Postgres database connection string.
-- `GEOCODER_API_KEY`: used with the `node-geocoder` module.
-
-Nodechef Object Storage credentials:
-- `NC_OBJECT_STORAGE_ACCESS_KEY`
-- `NC_OBJECT_STORAGE_SECRET_KEY`
-- `NC_OBJECT_STORAGE_ENDPOINT`
-
+| Name | Description |
+| -------- | ----------- |
+| `PORT`   | Server port |
+| `HOST`   | Server host (ex "http://villi-4983.nodechef.com" or http://localhost") |
+| `DATABASE_URL`   | Postgres database connection string |
+| `NC_OBJECT_STORAGE_ACCESS_KEY` | Nodechef Object Storage access key |
+| `NC_OBJECT_STORAGE_SECRET_KEY` | Nodechef Object Storage secret key |
+| `NC_OBJECT_STORAGE_ENDPOINT` | Nodechef Object Storage endpoint |
+| `JWT_SECRET_KEY` | |
+| `EMAIL_HOST` | |
+| `EMAIL_PORT` | |
+| `EMAIL_USER` | |
+| `EMAIL_PASSWORD` | |
 
 ### Travis CI
 
 A `NC_DEPLOY_TOKEN` environment variable must be added to Travis environment variables.
 This is used to [deploy builds to Nodechef](https://www.nodechef.com/docs/node/deploy).
+
+## Sending mails in development
+[Ethereal](https://ethereal.email/) allows us to send mails as normal. However they are never delivered but instead available as [messages at Ethereal](https://ethereal.email/messages).
+
+The credentials for logging into Ethereal are defined in the `EMAIL_USER` and `EMAIL_PASSWORD` enviroment variables in the `.env` file.
 
 ## Admin app
 

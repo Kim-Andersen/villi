@@ -16,7 +16,6 @@ export class S3ObjectStorage implements IObjectStorage {
         secretAccessKey: config.nodechef.objectStorage.secretAccessKey,
       },
       endpoint: config.nodechef.objectStorage.endpoint
-      // region: config.nodechef.objectStorage.endpoint
     });
   }
 
