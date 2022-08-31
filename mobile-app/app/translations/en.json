@@ -1,0 +1,108 @@
+{
+   "createPost": {
+      "addAction": "Add action"
+   },
+   "actions":{
+     "categories":{
+        "food":{
+           "title":"Food",
+           "description":""
+        },
+        "transport":{
+           "title":"Transport",
+           "description":""
+        },
+        "stuff":{
+           "title":"Stuff",
+           "description":""
+        },
+        "fun":{
+           "title":"Stuff",
+           "description":""
+        }
+     },
+     "groups":{
+        "growYourOwn":{
+           "title":"Grow your own food",
+           "description":"Grow your own food and connect to where it comes from in order to save money and to reduce transport, packaging, and food waste",
+           "why": "By growing your own food, even if it only replaces a small amount of what you consume commercially, you can connect better to what you are eating, along with reduce impacts of packaging, transport, and food waste. Food waste is a significant issue, from the sum of the impacts of the resources used in creating the item, to the packaging and grocery bags needed to get them home, through to the waste from the supply chain and commercial expectations of what food should look like aesthetically. Access to land and time to garden is not the same for everyone, so if you can’t grow your own, then consider finding local farmers and support them or join a farmers cooperative. There are so many added benefits to more small scale community agriculture, such as better food, air, and soil quality, pollinator plants for bees and other insects, and more nutrients in your diet."
+        },
+        "useAllYourFood":{
+           "title":"Use all your food",
+           "description":"Get organic waste out of trash heaps and landfills to reduce methane, improve soil fertility, and increase equitable access to fresh food",
+           "why": "Soils need nutrients to produce healthy and delicious food, but globally, we remove plants from land and then throw the waste materials into big holes or giant heaps where they mix with other household materials and microorganisms to produce unhealthy toxic leachates and methane (which is a 25x more potent greenhouse gas than carbon dioxide emissions). Old food scraps and stale bread are not trash at all! They are filled with the building blocks of life - nutrients! Your body digests them when you eat it, but if you don't, then the soil could really use the nutrients. This in turn can reduce the need for (added) fertilizers and chemicals that often end up depleting the soil’s health and productivity in the long run. So, by getting organics out of open dumps and landfills, we can reduce emissions into the air and toxins into the environment as well as give nutrients back to the soils to produce even more healthy and delicious plants."
+        },
+        "proteinSwap":{
+           "title":"Use all your food",
+           "description":"Reduce or eliminate meat and animal product consumption habits and adopt a more plant-based diet",
+           "why": "Swapping meat-based meals for meals with proteins from other sources reduces negative environmental impacts AND is good for your health. The more vegetables you eat, the more nutrients and you get the better you can feel. Not everyone in the world can suddenly go vegan/vegetarian but everyone can reduce the amount of animal-based proteins that they buy and consume and this can have staggeringly positive impacts. By swapping to a more a vegetable-based diet, consciously being more selective in where your meat comes from or becoming a weekday vegetarian – these can all add up to shifts in the types of proteins on the market and the impact they have on the planet. The issues go well beyond cruelty to animals experience in factory farms. Global animal protein consumption is a huge issue especially as it relates to carbon emissions."
+        }
+     },
+     "items":{
+        "eatSeasonally":{
+           "title":"Eat what is seasonally available",
+           "description":""
+        },
+        "locallyProducedFoods":{
+           "title":"Opt for locally produced foods",
+           "description":""
+        },
+        "localFarmers":{
+           "title":"Seek out local farmers",
+           "description":""
+        },
+        "plantBasedProteins":{
+           "title":"Plant-based proteins",
+           "description":"Swap animal protein for more plant-based proteins"
+        },
+        "startKitchenGarden":{
+           "title":"Start a kitchen garden",
+           "description":"Start a kitchen garden"
+        },
+        "joinUrbanGarden":{
+           "title":"Join an urban garden",
+           "description":"Join an urban garden"
+        },
+        "regrowYourFood":{
+           "title":"Regrow your food",
+           "description":"Regrow vegetables like leeks, carrots, and beets in your house in a glass of water before discarding them"
+        },
+        "shopAtFarmersMarkets":{
+           "title":"Shop at farmers markets",
+           "description":"Shop at farmers markets if you can’t grow food yourself"
+        },
+        "supportLocalSustainableFarmers":{
+           "title":"Support a local sustainable farmer",
+           "description":"Support a local sustainable farmer if you can’t grow food yourself"
+        },
+        "shareSustainableFoodOptions": {
+            "title": "Share sustainable food options",
+            "description":""
+        },
+        "weekdayVegetarian": {
+            "title": "Become a weekday vegetarian",
+            "description":""
+        },
+        "weekdayFlexitarian": {
+         "title": "Become a weekday flexitarian",
+         "description": ""
+         },
+         "shareExcessFood": {
+            "title": "Share excess food",
+            "description": "Share excess food to help ensure everyone has enough (there are many apps that help with this)"
+         },
+         "maximizeFreshness": {
+            "title": "Maximize food freshness",
+            "description": "Manage how you store food to maximize freshness, such as using sealed containers in your fridge and pantry"
+         },
+         "avoidPackaging": {
+            "title": "Avoid excessive packaging",
+            "description": "When buying foods, avoid excessive packaging and take your own produce bags"
+         },
+         "foodOrigin": {
+            "title": "Find out where your food comes from",
+            "description": "Connect with your food: find out where your food comes from and how it is produced "
+         }
+     }
+  }
+}
